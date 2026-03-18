@@ -13,7 +13,7 @@ function App() {
     setActiveCategory(null);
     setSelectedProduct(null);
     setSearchTerm("");
-  };
+  };  
 
   // Logic for search results
   const searchedProducts = products.filter(p => 
