@@ -1,151 +1,382 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
+import emailjs from "@emailjs/browser";
+import { QRCodeSVG } from "qrcode.react";
 
-export default function OrderForm({ product, goBack }) {
-  // State for the form fields
+export default function OrderForm({ cart, total, goBack }) {
+  const [step, setStep] = useState("form");
+  const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [orderSuccess, setOrderSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
+    email: "",
     address: "",
-    quantity: 1,
-    product: product?.name || "",
-    price: product?.price || 0,
+    transactionId: "",
+    payerName: "",
   });
 
-  // State to handle button loading UI
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // --- ENV VARIABLES ---
+  const upiId = process.env.REACT_APP_UPI_ID || "";
+  const merchantName = process.env.REACT_APP_MERCHANT_NAME || "ShimmerNest";
+  const sellerWhatsApp = process.env.REACT_APP_SELLER_PHONE || "";
 
-  // Update form data if the product prop changes (e.g. user selects a different item)
-  useEffect(() => {
-    if (product) {
-      setFormData((prev) => ({
-        ...prev,
-        product: product.name,
-        price: product.price,
-      }));
-    }
-  }, [product]);
+  const upiPayload = upiId
+    ? `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${total}&cu=INR&tn=Order_ShimmerNest`
+    : "";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: name === "quantity" ? Number(value) : value,
-    });
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error on change
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true); // Start loading
+  const copyUpi = () => {
+    if (!upiId) return alert("UPI ID not configured yet.");
+    navigator.clipboard.writeText(upiId);
+    alert("UPI ID copied! Paste it in your payment app. ✨");
+  };
+
+  // --- VALIDATION ---
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) newErrors.name = "Name is required.";
+    if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/))
+      newErrors.email = "Enter a valid email address.";
+    if (!formData.phone.match(/^[6-9]\d{9}$/))
+      newErrors.phone = "Enter a valid 10-digit Indian mobile number.";
+    if (!formData.address.trim() || formData.address.trim().length < 10)
+      newErrors.address = "Please enter your full address with pincode.";
+    if (!agreed) newErrors.agreed = "Please accept the terms to continue.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const isFormIncomplete =
+    !formData.name || !formData.phone || !formData.email || !formData.address || !agreed;
+
+  const handleOrderSubmit = async () => {
+    const utrClean = formData.transactionId.replace(/\s/g, "");
+    if (!/^\d{12}$/.test(utrClean)) {
+      setErrors((prev) => ({
+        ...prev,
+        transactionId: "Please enter a valid 12-digit UTR/Transaction ID.",
+      }));
+      return;
+    }
+
+    setLoading(true);
+    const orderId = `SN-${Math.floor(1000 + Math.random() * 9000)}`;
+    const itemSummary = cart
+      .map((i) => `• ${i.name} (${i.selectedColor || "Default"}) x${i.qty}`)
+      .join("\n");
 
     try {
-      // API call to your backend
-      const response = await axios.post("http://localhost:5000/api/orders/create", formData);
-      
-      if (response.status === 201 || response.status === 200) {
-        alert("Order placed successfully 💜");
-        
-        // Reset form to initial state
-        setFormData({
-          name: "",
-          phone: "",
-          address: "",
-          quantity: 1,
-          product: product.name,
-          price: product.price,
+      // 1. SAVE TO DATABASE
+      if (process.env.REACT_APP_API_URL) {
+        await axios.post(`${process.env.REACT_APP_API_URL}/api/orders`, {
+          orderId,
+          customer: {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            address: formData.address,
+          },
+          items: cart.map((i) => ({
+            name: i.name,
+            color: i.selectedColor || "Default",
+            qty: i.qty,
+            price: i.price,
+          })),
+          payment: {
+            totalAmount: total,
+            transactionId: utrClean,
+            payerName: formData.payerName || "Self",
+          },
         });
-
-        goBack(); // Return to the gallery/main page
       }
+
+      // 2. EMAILJS RECEIPT
+      if (
+        process.env.REACT_APP_EMAILJS_SERVICE_ID &&
+        process.env.REACT_APP_EMAILJS_TEMPLATE_ID &&
+        process.env.REACT_APP_EMAILJS_PUBLIC_KEY
+      ) {
+        await emailjs.send(
+          process.env.REACT_APP_EMAILJS_SERVICE_ID,
+          process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
+          {
+            order_id: orderId,
+            to_name: formData.name,
+            to_email: formData.email,
+            order_details: itemSummary,
+            amount: total,
+            transaction_id: utrClean,
+          },
+          process.env.REACT_APP_EMAILJS_PUBLIC_KEY
+        );
+      }
+
+      // 3. WHATSAPP REDIRECT
+      const whatsappMsg = window.encodeURIComponent(
+        `✨ *NEW ORDER: ${orderId}*\n\n` +
+        `📦 *Items:*\n${itemSummary}\n\n` +
+        `💰 *Total:* ₹${total}\n` +
+        `🔢 *UTR:* ${utrClean}\n` +
+        `👤 *Payer:* ${formData.payerName || "Same"}\n\n` +
+        `👤 *Customer:* ${formData.name}\n` +
+        `📞 *Phone:* ${formData.phone}\n` +
+        `📍 *Address:* ${formData.address}`
+      );
+
+      setOrderSuccess(true);
+      if (sellerWhatsApp) {
+        window.open(`https://wa.me/${sellerWhatsApp}?text=${whatsappMsg}`, "_blank");
+      }
+
     } catch (error) {
-      console.error("Submission Error:", error);
-      alert("Error placing order 😭 Please check if the server is running.");
+      console.error(error);
+      setErrors((prev) => ({
+        ...prev,
+        submit: "Something went wrong. Please check your connection and try again.",
+      }));
     } finally {
-      setIsSubmitting(false); // Stop loading
+      setLoading(false);
     }
   };
 
+  // --- SUCCESS SCREEN ---
+  if (orderSuccess) {
+    return (
+      <div className="animate-fadeIn max-w-2xl mx-auto pb-20 text-center pt-20">
+        <div className="text-8xl mb-6">🎉</div>
+        <h2 className="text-3xl font-black text-gray-800 tracking-tighter mb-4">
+          Order Placed! 💜
+        </h2>
+        <p className="text-gray-400 text-sm font-medium mb-2">
+          We've received your order and you'll get a confirmation on WhatsApp soon.
+        </p>
+        <p className="text-gray-400 text-sm font-medium mb-10">
+          Check your email for your invoice. 📧
+        </p>
+        <button
+          onClick={goBack}
+          className="px-10 py-4 bg-purple-600 text-white rounded-full font-black uppercase tracking-widest text-xs hover:bg-purple-700 transition-colors shadow-lg"
+        >
+          Back to Shop ✨
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6 bg-white rounded-2xl shadow-sm border border-purple-100">
-      {/* Back Button */}
-      <button 
-        onClick={goBack} 
-        className="mb-4 text-purple-600 hover:text-purple-800 font-medium flex items-center gap-1 transition-colors"
+    <div className="animate-fadeIn max-w-2xl mx-auto pb-20">
+      <button
+        onClick={goBack}
+        className="mb-8 text-purple-300 font-black text-[10px] uppercase tracking-widest flex items-center hover:text-purple-500 transition-colors"
       >
-        <span>←</span> Back to Gallery
+        ← Back to Basket
       </button>
 
-      {/* Header Section */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">
-          Ordering: <span className="text-purple-700">{product?.name}</span>
-        </h2>
-        <p className="text-gray-500 font-medium text-lg">
-          Price: ₹{product?.price}
-        </p>
-      </div>
+      {step === "form" ? (
+        <div className="space-y-8">
+          <div className="bg-white p-8 rounded-[3.5rem] shadow-2xl border-4 border-white space-y-6">
+            <h3 className="text-2xl font-black text-gray-800 italic">Delivery Details 🎀</h3>
 
-      {/* Form Section */}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-gray-600 ml-1">Name</label>
-          <input
-            name="name"
-            placeholder="Enter your full name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className="p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent outline-none transition-all"
-          />
+            <div className="grid gap-4">
+              {/* Name */}
+              <div>
+                <input
+                  name="name"
+                  placeholder="Full Name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className={`w-full p-4 bg-gray-50 rounded-2xl border-2 outline-none text-sm font-medium transition-colors ${
+                    errors.name ? "border-red-300 bg-red-50" : "border-transparent focus:border-purple-200"
+                  }`}
+                />
+                {errors.name && <p className="text-red-400 text-[10px] font-bold mt-1 ml-2">{errors.name}</p>}
+              </div>
+
+              {/* Email */}
+              <div>
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="Gmail for Invoice"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`w-full p-4 bg-gray-50 rounded-2xl border-2 outline-none text-sm font-medium transition-colors ${
+                    errors.email ? "border-red-300 bg-red-50" : "border-transparent focus:border-purple-200"
+                  }`}
+                />
+                {errors.email && <p className="text-red-400 text-[10px] font-bold mt-1 ml-2">{errors.email}</p>}
+              </div>
+
+              {/* Phone */}
+              <div>
+                <input
+                  name="phone"
+                  placeholder="WhatsApp Number (10 digits)"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  maxLength={10}
+                  className={`w-full p-4 bg-gray-50 rounded-2xl border-2 outline-none text-sm font-medium transition-colors ${
+                    errors.phone ? "border-red-300 bg-red-50" : "border-transparent focus:border-purple-200"
+                  }`}
+                />
+                {errors.phone && <p className="text-red-400 text-[10px] font-bold mt-1 ml-2">{errors.phone}</p>}
+              </div>
+
+              {/* Address */}
+              <div>
+                <textarea
+                  name="address"
+                  placeholder="Full Shipping Address with Pincode"
+                  rows="3"
+                  value={formData.address}
+                  onChange={handleChange}
+                  className={`w-full p-4 bg-gray-50 rounded-2xl border-2 outline-none text-sm font-medium resize-none transition-colors ${
+                    errors.address ? "border-red-300 bg-red-50" : "border-transparent focus:border-purple-200"
+                  }`}
+                />
+                {errors.address && <p className="text-red-400 text-[10px] font-bold mt-1 ml-2">{errors.address}</p>}
+              </div>
+            </div>
+
+            {/* Terms Checkbox */}
+            <div className={`flex items-start space-x-3 p-4 rounded-2xl border ${
+              errors.agreed ? "bg-red-50 border-red-200" : "bg-purple-50 border-purple-100"
+            }`}>
+              <input
+                type="checkbox"
+                id="agreed"
+                checked={agreed}
+                onChange={() => {
+                  setAgreed(!agreed);
+                  setErrors((prev) => ({ ...prev, agreed: "" }));
+                }}
+                className="mt-1 w-5 h-5 accent-purple-600 cursor-pointer"
+              />
+              <label htmlFor="agreed" className="text-[10px] font-bold text-gray-500 uppercase leading-relaxed">
+                Handmade takes <span className="text-purple-600">3-5 days</span>. I accept the No Refund policy. 💜
+              </label>
+            </div>
+            {errors.agreed && <p className="text-red-400 text-[10px] font-bold ml-2">{errors.agreed}</p>}
+          </div>
+
+          <button
+            onClick={() => { if (validateForm()) setStep("payment"); }}
+            disabled={isFormIncomplete}
+            className={`w-full py-6 rounded-[2.5rem] font-black uppercase tracking-[0.3em] text-xs shadow-2xl transition-all ${
+              isFormIncomplete
+                ? "bg-gray-100 text-gray-300 cursor-not-allowed"
+                : "bg-purple-600 text-white hover:bg-purple-700 active:scale-95"
+            }`}
+          >
+            Go to Payment ₹{total}
+          </button>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-gray-600 ml-1">Phone Number</label>
-          <input
-            type="tel"
-            name="phone"
-            placeholder="Enter 10-digit number"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-            className="p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent outline-none transition-all"
-          />
-        </div>
+      ) : (
+        <div className="bg-white p-8 rounded-[4rem] shadow-2xl border-4 border-white text-center space-y-8">
+          <h3 className="text-2xl font-black text-gray-800 italic">Scan & Pay ✨</h3>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-gray-600 ml-1">Delivery Address</label>
-          <textarea
-            name="address"
-            placeholder="Enter house no, street, landmark, city..."
-            value={formData.address}
-            onChange={handleChange}
-            required
-            className="p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent outline-none h-24 resize-none transition-all"
-          />
-        </div>
+          {/* QR Code */}
+          <div className="relative inline-block p-6 bg-white border-[12px] border-purple-50 rounded-[3.5rem] shadow-xl">
+            {upiPayload ? (
+              <QRCodeSVG value={upiPayload} size={200} fgColor="#6b21a8" level="H" includeMargin={true} />
+            ) : (
+              <p className="text-gray-400 text-sm font-medium w-[200px] h-[200px] flex items-center justify-center">
+                UPI not configured
+              </p>
+            )}
+            <div className="absolute -top-4 -right-4 bg-pink-500 text-white text-[10px] font-black px-4 py-1.5 rounded-full shadow-lg border-2 border-white animate-bounce">
+              SCAN ME
+            </div>
+          </div>
 
-        <div className="flex items-center justify-between bg-purple-50 p-3 rounded-xl">
-          <label className="font-semibold text-purple-900">Quantity</label>
-          <input
-            type="number"
-            name="quantity"
-            value={formData.quantity}
-            onChange={handleChange}
-            min="1"
-            className="p-2 border border-purple-200 rounded-lg w-20 text-center font-bold outline-none focus:ring-2 focus:ring-purple-400"
-          />
-        </div>
+          {/* UPI ID Copy */}
+          <div className="max-w-xs mx-auto space-y-4">
+            <div className="bg-purple-50 p-4 rounded-2xl border-2 border-dashed border-purple-200 flex items-center justify-between">
+              <div className="text-left">
+                <p className="text-[8px] font-black text-purple-300 uppercase">UPI ID</p>
+                <p className="text-xs font-mono font-bold text-purple-900">{upiId || "Not set"}</p>
+              </div>
+              <button
+                onClick={copyUpi}
+                className="bg-purple-600 text-white p-2 px-4 rounded-xl text-[10px] font-black uppercase hover:bg-purple-700 transition-colors"
+              >
+                Copy
+              </button>
+            </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className={`${
-            isSubmitting ? "bg-purple-300" : "bg-purple-600 hover:bg-purple-700 shadow-md active:scale-95"
-          } text-white font-bold py-4 rounded-2xl transition-all flex justify-center items-center`}
-        >
-          {isSubmitting ? "Processing Order..." : "Place Order 💜"}
-        </button>
-      </form>
+            <div className="bg-gray-900 text-white py-6 rounded-[2.5rem]">
+              <p className="text-[9px] font-bold uppercase tracking-widest opacity-50">Amount to Pay</p>
+              <p className="text-5xl font-black italic tracking-tighter">₹{total}</p>
+            </div>
+          </div>
+
+          {/* UTR Fields */}
+          <div className="space-y-4 text-left pt-4">
+            <div>
+              <label className="text-[10px] font-black text-purple-400 uppercase tracking-widest ml-4">
+                Account Holder Name (If different)
+              </label>
+              <input
+                name="payerName"
+                placeholder="Name on Bank Account"
+                value={formData.payerName}
+                onChange={handleChange}
+                className="w-full p-4 mt-1 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-purple-200 outline-none text-sm font-bold"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-black text-purple-400 uppercase tracking-widest ml-4">
+                12-Digit Transaction UTR
+              </label>
+              <input
+                name="transactionId"
+                placeholder="123456789012"
+                maxLength="12"
+                value={formData.transactionId}
+                onChange={handleChange}
+                className={`w-full p-5 mt-1 bg-gray-50 rounded-2xl border-4 text-center font-mono text-2xl tracking-[0.2em] outline-none transition-colors text-purple-900 ${
+                  errors.transactionId ? "border-red-300 bg-red-50" : "border-purple-100 focus:border-purple-400"
+                }`}
+              />
+              {errors.transactionId && (
+                <p className="text-red-400 text-[10px] font-bold mt-1 ml-2">{errors.transactionId}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Submit Error */}
+          {errors.submit && (
+            <div className="bg-red-50 border border-red-200 text-red-500 text-xs font-bold p-4 rounded-2xl">
+              {errors.submit}
+            </div>
+          )}
+
+          <button
+            onClick={handleOrderSubmit}
+            disabled={loading}
+            className="w-full py-6 bg-green-600 text-white rounded-[2.5rem] font-black uppercase tracking-[0.3em] text-xs shadow-xl hover:bg-green-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Confirming Magic... 🧶" : "I have Paid ✅"}
+          </button>
+
+          <button
+            onClick={() => setStep("form")}
+            className="text-purple-300 font-black text-[10px] uppercase tracking-widest hover:text-purple-500 transition-colors"
+          >
+            ← Edit Details
+          </button>
+        </div>
+      )}
     </div>
   );
 }

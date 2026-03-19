@@ -5,6 +5,7 @@
     "tailwindcss": "^3.4.19"
   },
   "dependencies": {
-    "cors": "^2.8.6"
+    "cors": "^2.8.6",
+    "qrcode.react": "^4.2.0"
   }
 }

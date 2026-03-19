@@ -1,3 +1,151 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  /* Default font & background from our theme */
+  body {
+    @apply antialiased text-gray-800 bg-[#FCF8FF];
+    font-family: 'Outfit', sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Smooth transitions on all interactive elements */
+  button, a, input, textarea {
+    @apply transition-all duration-300;
+  }
+
+  /* Custom text selection */
+  ::selection {
+    @apply bg-pink-200 text-purple-700;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+
+  /* --- Primary Button --- */
+  .btn-shimmer {
+    @apply px-6 py-3 rounded-2xl font-black uppercase tracking-widest
+           bg-purple-600 text-white shadow-lg
+           hover:bg-purple-700 active:scale-95
+           relative overflow-hidden;
+  }
+
+  /* --- Input Fields --- */
+  .input-shimmer {
+    @apply w-full p-4 border-2 border-purple-50 rounded-2xl bg-white
+           outline-none focus:border-purple-200 shadow-sm;
+  }
+
+  /* --- Glass Card --- */
+  .glass-card {
+    @apply bg-white/60 backdrop-blur-md border border-white/40
+           shadow-[0_10px_40px_-10px_rgba(147,51,234,0.08)];
+  }
+
+  /* --- Background Blobs --- */
+  .bg-blob {
+    @apply fixed rounded-full blur-[100px] -z-10 pointer-events-none;
+  }
+
+  /* --- Product Tag Badge --- */
+  .tag-badge {
+    @apply bg-white/90 backdrop-blur-md text-purple-600
+           text-[9px] font-black px-4 py-1.5 rounded-2xl
+           shadow-sm border border-purple-50 uppercase tracking-widest;
+  }
+}
+
+@layer utilities {
+
+  /* --- Hide Scrollbar --- */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* --- Fade In Animation --- */
+  .animate-fadeIn {
+    animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  /* --- Float Animation --- */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+}
+
+/* --- Keyframes --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes float {
+  0%   { transform: translateY(0px)   rotate(0deg);   }
+  50%  { transform: translateY(-12px) rotate(1.5deg); }
+  100% { transform: translateY(0px)   rotate(0deg);   }
+}
+
+/* --- ✨ Sparkle Effect (single source of truth) --- */
+.sparkle {
+  position: fixed;        /* fixed so it doesn't offset inside containers */
+  width: 6px;
+  height: 6px;
+  background: #d8b4fe;   /* light purple */
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  animation: sparkle-fade 0.8s ease-out forwards;
+  box-shadow: 0 0 10px #f472b6; /* pink glow */
+}
+
+@keyframes sparkle-fade {
+  0%   { transform: scale(0);   opacity: 1;   }
+  50%  { transform: scale(1.5); opacity: 0.8; }
+  100% { transform: scale(0);   opacity: 0;   }
+}
+
+/* --- Scrollbar Styling --- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-[#FCF8FF];
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#f3e8ff, #fbcfe8);
+  border-radius: 100px;
+  border: 2px solid #FCF8FF;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(#7e22ce, #fbcfe8);
+}
+
+/* --- Focus Accessibility --- */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #7e22ce;
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* --- Mobile --- */
+@media (max-width: 768px) {
+  body {
+    cursor: auto;
+  }
+}
