@@ -2,16 +2,10 @@ const mongoose = require('mongoose');
 
 const OrderSchema = new mongoose.Schema(
   {
-    // --- ORDER IDENTITY ---
-    orderId: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      index: true  // fast lookup by SN-XXXX
-    },
+    // ── ORDER IDENTITY ──────────────────────────────────────
+    orderId: { type: String, required: true, unique: true, trim: true, index: true },
 
-    // --- CUSTOMER DETAILS ---
+    // ── CUSTOMER DETAILS ────────────────────────────────────
     customer: {
       name:    { type: String, required: true, trim: true },
       email:   { type: String, required: true, trim: true, lowercase: true },
@@ -19,29 +13,26 @@ const OrderSchema = new mongoose.Schema(
       address: { type: String, required: true, trim: true }
     },
 
-    // --- ORDER ITEMS ---
+    // ── ORDER ITEMS ─────────────────────────────────────────
     items: [
       {
-        productId:     { type: String, trim: true },
         name:          { type: String, required: true },
         price:         { type: Number, required: true },
         qty:           { type: Number, required: true, min: 1 },
         selectedColor: { type: String, default: "Original" },
-        note:          { type: String, default: "" }  // custom note from ProductDetail
+        note:          { type: String, default: "" }
       }
     ],
 
-    // --- PAYMENT ---
+    // ── PAYMENT ─────────────────────────────────────────────
     payment: {
-      totalAmount:   { type: Number, required: true },
-      transactionId: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true
-      },
-      payerName:     { type: String, default: "Self" },
-      method:        { type: String, default: "UPI QR" },
+      totalAmount:    { type: Number, required: true },
+      subtotal:       { type: Number, default: 0 },
+      deliveryCharge: { type: Number, default: 0 },
+      giftWrapCharge: { type: Number, default: 0 },
+      transactionId:  { type: String, required: true, trim: true },
+      payerName:      { type: String, default: "Self" },
+      method:         { type: String, default: "UPI Manual" },
       status: {
         type: String,
         enum: ['Pending Verification', 'Paid', 'Failed'],
@@ -49,27 +40,37 @@ const OrderSchema = new mongoose.Schema(
       }
     },
 
-    // --- ORDER STATUS ---
+    // ── GIFT WRAP ───────────────────────────────────────────
+    giftWrap: {
+      enabled: { type: Boolean, default: false },
+      message: { type: String, default: "" }
+    },
+
+    // ── ORDER STATUS ────────────────────────────────────────
     orderStatus: {
       type: String,
-      enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled'],
+      enum: ['Processing', 'Confirmed', 'Crafting', 'Shipped', 'Delivered', 'Cancelled'],
       default: 'Processing'
-    }
+    },
+
+    // ── SHIPPING INFO ───────────────────────────────────────
+    shipping: {
+      trackingId:    { type: String, default: "" },
+      courier:       { type: String, default: "" },
+      shippedAt:     { type: Date },
+      deliveredAt:   { type: Date },
+      estimatedDays: { type: Number, default: 7 }
+    },
+
+    // ── ADMIN NOTES ─────────────────────────────────────────
+    adminNotes: { type: String, default: "" }
   },
-  {
-    // Auto-manages createdAt and updatedAt
-    timestamps: true
-  }
+  { timestamps: true }
 );
 
-// --- INDEXES ---
-// Fast lookup by transaction ID (prevent duplicate UTR)
 OrderSchema.index({ 'payment.transactionId': 1 }, { unique: true });
-// Fast lookup by customer email (for order history)
 OrderSchema.index({ 'customer.email': 1 });
-// Fast lookup by order status (for seller dashboard)
 OrderSchema.index({ orderStatus: 1 });
-// Fast lookup by date (for recent orders)
 OrderSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('Order', OrderSchema);

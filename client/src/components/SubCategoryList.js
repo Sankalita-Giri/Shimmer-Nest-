@@ -4,15 +4,22 @@ import { subCategories } from '../data';
 export default function SubCategoryList({ activeCat, setSubCat, setView, goBack }) {
   const currentSubCats = subCategories[activeCat] || [];
 
-  // Safely singularize category name for footer (e.g. "bouquets" -> "bouquet")
   const singular = activeCat
     ? activeCat.charAt(0).toUpperCase() + activeCat.slice(1, -1)
     : 'Item';
 
+  // Category display names
+  const catNames = {
+    keychains: "Crochet Keychains",
+    plushies:  "Crochet Mini Plushies",
+    totes:     "Crochet Tote Bags",
+    hair:      "Hair Accessories",
+    bouquets:  "Crochet Bouquets",
+  };
+  const catName = catNames[activeCat] || activeCat;
+
   return (
     <div className="animate-fadeIn">
-
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
         <div>
           <button
@@ -23,15 +30,14 @@ export default function SubCategoryList({ activeCat, setSubCat, setView, goBack 
             Back to Shop
           </button>
           <h2 className="text-5xl font-black text-gray-800 italic capitalize tracking-tighter">
-            {activeCat} <span className="text-purple-600 font-medium">Studio</span>
+            {catName} <span className="text-purple-600 font-medium">Studio</span>
           </h2>
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2 ml-1">
-            Explore our handmade {activeCat} varieties
+            Explore our handmade {catName.toLowerCase()} varieties
           </p>
         </div>
       </div>
 
-      {/* Empty State */}
       {currentSubCats.length === 0 ? (
         <div className="text-center py-32 bg-white/50 backdrop-blur-sm rounded-[4rem] border-4 border-dashed border-purple-100 flex flex-col items-center">
           <div className="relative">
@@ -40,9 +46,7 @@ export default function SubCategoryList({ activeCat, setSubCat, setView, goBack 
             </div>
             <div className="absolute -top-2 -right-2 w-8 h-8 bg-pink-400 rounded-full border-4 border-white animate-ping"></div>
           </div>
-          <h3 className="text-3xl font-black text-gray-800 italic mb-3 tracking-tighter">
-            Coming Soon...
-          </h3>
+          <h3 className="text-3xl font-black text-gray-800 italic mb-3 tracking-tighter">Coming Soon...</h3>
           <p className="text-gray-400 font-bold text-[10px] uppercase tracking-[0.2em] max-w-[280px] mx-auto leading-relaxed opacity-70">
             We're working on something magical for this category!
           </p>
@@ -54,7 +58,6 @@ export default function SubCategoryList({ activeCat, setSubCat, setView, goBack 
           </button>
         </div>
       ) : (
-        /* Sub-Category Grid */
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-10">
           {currentSubCats.map((sub) => (
             <div
@@ -66,21 +69,15 @@ export default function SubCategoryList({ activeCat, setSubCat, setView, goBack 
               }}
               className="group cursor-pointer text-center"
             >
-              {/* Circle Image */}
               <div className="relative aspect-square mb-6">
-                {/* Glow */}
                 <div className="absolute inset-0 bg-purple-200 rounded-full blur-2xl opacity-0 group-hover:opacity-40 transition-opacity duration-500" />
-
                 <div className="relative h-full w-full rounded-full border-[12px] border-white shadow-2xl overflow-hidden transition-all duration-700 group-hover:scale-105 group-hover:border-purple-50">
                   <img
                     src={sub.image}
                     alt={sub.name}
                     className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
-                    onError={(e) => {
-                      e.target.src = 'https://placehold.co/400x400?text=✨';
-                    }}
+                    onError={(e) => { e.target.src = 'https://placehold.co/400x400?text=✨'; }}
                   />
-                  {/* Hover Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-purple-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
                     <span className="bg-white/20 backdrop-blur-md px-4 py-2 rounded-full text-[10px] font-black text-white uppercase tracking-widest border border-white/30">
                       View All
@@ -88,8 +85,6 @@ export default function SubCategoryList({ activeCat, setSubCat, setView, goBack 
                   </div>
                 </div>
               </div>
-
-              {/* Label */}
               <h3 className="font-black text-gray-800 uppercase tracking-tighter text-sm md:text-base group-hover:text-purple-600 transition-colors">
                 {sub.name}
               </h3>
@@ -107,7 +102,6 @@ export default function SubCategoryList({ activeCat, setSubCat, setView, goBack 
         </div>
       )}
 
-      {/* Footer Note */}
       {currentSubCats.length > 0 && (
         <div className="mt-20 py-10 border-t-4 border-dashed border-purple-50 text-center">
           <p className="text-[11px] font-black text-purple-200 uppercase tracking-[0.5em]">
