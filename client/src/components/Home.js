@@ -244,6 +244,74 @@ export default function Home({ setView, setActiveCat, setSelectedProduct }) {
           </div>
         </section>
 
+        {/* ── WOOL SHOPPING ───────────────────────────────────────── */}
+        <section className="py-10">
+          <div
+            onClick={() => { setActiveCat('wool'); setView('subcat'); window.scrollTo(0,0); }}
+            className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-[3rem] border-4 border-white shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 cursor-pointer group p-8 relative overflow-hidden"
+          >
+            {/* Decorative bg */}
+            <div className="absolute -right-8 -bottom-8 text-[12rem] opacity-[0.04] select-none pointer-events-none leading-none">🧶</div>
+
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              {/* Left text */}
+              <div className="flex-none md:w-72">
+                <div className="inline-flex items-center gap-2 bg-purple-100 px-4 py-1.5 rounded-full mb-4">
+                  <span className="text-[9px] font-black text-purple-600 uppercase tracking-widest">New Section</span>
+                </div>
+                <h2 className="text-4xl font-black text-gray-900 tracking-tighter mb-3">
+                  🧶 Wool Shopping
+                </h2>
+                <p className="text-gray-500 text-sm font-medium leading-relaxed mb-4">
+                  Premium crochet wool available in 50+ vibrant colours. Choose from 20gm or 100gm packs — perfect for all your crafting needs!
+                </p>
+                <div className="flex gap-3 flex-wrap mb-6">
+                  {["Red","Pink","Blue","Green","Yellow","Purple","Black","White","Orange","Peach"].map((c,i) => (
+                    <span key={i} className="text-[9px] font-black text-gray-500 bg-white px-3 py-1 rounded-full border border-gray-100 shadow-sm">
+                      {c}
+                    </span>
+                  ))}
+                  <span className="text-[9px] font-black text-purple-500 bg-purple-50 px-3 py-1 rounded-full border border-purple-100">
+                    +40 more colours →
+                  </span>
+                </div>
+                <div className="flex gap-4">
+                  <div className="bg-white rounded-2xl px-5 py-3 shadow-sm border border-purple-100 text-center">
+                    <p className="font-black text-purple-700 text-lg">₹45</p>
+                    <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">20 gms</p>
+                  </div>
+                  <div className="bg-white rounded-2xl px-5 py-3 shadow-sm border border-purple-100 text-center">
+                    <p className="font-black text-purple-700 text-lg">₹180</p>
+                    <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">100 gms</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: colour swatches grid */}
+              <div className="flex-grow">
+                <div className="grid grid-cols-10 gap-1.5">
+                  {[
+                    "#ef4444","#dc2626","#ec4899","#f472b6","#f9a8d4",
+                    "#fb923c","#fbbf24","#facc15","#a3e635","#4ade80",
+                    "#34d399","#2dd4bf","#22d3ee","#60a5fa","#818cf8",
+                    "#a78bfa","#c084fc","#e879f9","#ffffff","#000000",
+                    "#6b7280","#92400e","#7c3aed","#0ea5e9","#f97316",
+                    "#fde68a","#d1fae5","#ddd6fe","#fce7f3","#e0f2fe",
+                  ].map((color, i) => (
+                    <div key={i}
+                      className="aspect-square rounded-lg shadow-sm border-2 border-white group-hover:scale-105 transition-transform duration-300"
+                      style={{ backgroundColor: color, transitionDelay: `${i * 10}ms` }}
+                    />
+                  ))}
+                </div>
+                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-3 text-right">
+                  50+ colours available · Click to explore →
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ── GIFT GUIDE ────────────────────────────────────────── */}
         <section id="gift-guide-section" className="py-16">
           <div className="mb-10 text-center">

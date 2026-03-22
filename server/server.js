@@ -1,37 +1,35 @@
-const express     = require('express');
-const mongoose    = require('mongoose');
-const cors        = require('cors');
-const orderRoutes = require('./routes/orderRoutes');
+const express         = require('express');
+const mongoose        = require('mongoose');
+const cors            = require('cors');
+const orderRoutes     = require('./routes/orderRoutes');
+const customerRoutes  = require('./routes/customerRoutes');
+const cartRoutes      = require('./routes/cartRoutes');
 require('dotenv').config();
 
 const app = express();
 
 // 1. CORS
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'x-admin-key']
-}));
-
-// 2. Body Parser
+app.use(cors());
 app.use(express.json());
 
-// 3. Routes
-app.use('/api/orders', orderRoutes);
+// 2. Routes
+app.use('/api/orders',    orderRoutes);
+app.use('/api/customers', customerRoutes);
+app.use('/api/cart',      cartRoutes);
 
-// 4. Health check
+// 3. Health check
 app.get('/', (req, res) => {
   res.json({
     message: "ShimmerNest Backend Running ✨",
-    db: mongoose.connection.readyState === 1 ? "✅ MongoDB Connected" : "❌ MongoDB Disconnected"
+    db: mongoose.connection.readyState === 1 ? "✅ Connected" : "❌ Disconnected"
   });
 });
 
-// 5. MongoDB Connection
-console.log("🔍 URI loaded:", process.env.MONGO_URI ? "✅ Yes" : "❌ Not found in .env");
+// 4. MongoDB
+console.log("🔍 URI loaded:", process.env.MONGO_URI ? "✅ Yes" : "❌ Not found");
 
 mongoose.connect(process.env.MONGO_URI, {
-  dbName: 'shimmernest',            // ← ensures correct DB is used
+  dbName: 'shimmernest',
   serverSelectionTimeoutMS: 10000,
 })
   .then(() => {
@@ -39,11 +37,10 @@ mongoose.connect(process.env.MONGO_URI, {
     console.log("📦 Database:", mongoose.connection.db.databaseName);
   })
   .catch(err => {
-    console.error("❌ MongoDB Connection Failed:", err.message);
-    console.error("👉 Fix: Whitelist your IP in Atlas → Network Access → Add 0.0.0.0/0");
+    console.error("❌ MongoDB Failed:", err.message);
   });
 
-// 6. Start Server
+// 5. Start
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

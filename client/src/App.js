@@ -9,6 +9,11 @@ import ProductDetail from "./components/ProductDetail";
 import SubCategoryList from "./components/SubCategoryList";
 import AnnouncementBanner from "./components/AnnouncementBanner";
 import AdminDashboard from "./components/AdminDashboard";
+import LoginPage from "./components/LoginPage";
+import MyOrders from "./components/MyOrders";
+import { useAuth } from "./context/AuthContext";
+import { useTheme } from "./context/ThemeContext";
+import SettingsPanel from "./components/SettingsPanel";
 import AllCategories from "./components/AllCategories";
 
 // ── Pricing constants (also used in cart preview) ─────────
@@ -19,13 +24,16 @@ const FREE_GIFT_MIN     = 300;
 const INITIAL_HASH = window.location.hash;
 
 export default function App() {
+  const { customer, isLoggedIn, getToken } = useAuth();
+  const { dark } = useTheme();
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [view, setView]                     = useState("home");
   const [activeCat, setActiveCat]           = useState(null);
   const [activeSubCat, setActiveSubCat]     = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [prevView, setPrevView]             = useState("home");
   const [searchQuery, setSearchQuery]       = useState("");
-  const [cart, setCart]                     = useState([]);
+  const [cart, setCart] = useState([]);
   const [toast, setToast]                   = useState(null);
   const [completedOrder, setCompletedOrder] = useState(null);
 
@@ -51,6 +59,56 @@ export default function App() {
     return () => window.removeEventListener('hashchange', checkHash);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ── MONGODB CART — load when customer logs in ─────────────
+  useEffect(() => {
+    if (!customer?.email) return;
+    const token = getToken();
+    if (!token) return;
+
+    const loadCart = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/cart`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (data.items && data.items.length > 0) {
+            setCart(data.items);
+            showToast(`Welcome back! Your basket has ${data.items.length} item${data.items.length > 1 ? 's' : ''} 🧺`);
+          }
+        }
+      } catch {}
+    };
+    loadCart();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customer?.email]);
+
+  // ── MONGODB CART — save whenever cart changes ───────────────
+  useEffect(() => {
+    if (!customer?.email) return;
+    const token = getToken();
+    if (!token) return;
+
+    const saveCart = async () => {
+      try {
+        await fetch(
+          `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/cart`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ items: cart })
+          }
+        );
+      } catch {}
+    };
+
+    // Debounce — only save 1 second after last change
+    const timer = setTimeout(saveCart, 1000);
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart]);
 
   // ── sparkle effect ─────────────────────────────────────────
   useEffect(() => {
@@ -96,8 +154,16 @@ export default function App() {
   const handleOrderSuccess = useCallback((orderData) => {
     setCompletedOrder(orderData);
     setCart([]);
+    // Clear cart in MongoDB after order success
+    const token = getToken();
+    if (token) {
+      fetch(
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/cart`,
+        { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } }
+      ).catch(() => {});
+    }
     changeView("thankyou");
-  }, [changeView]);
+  }, [changeView, getToken]);
 
   const filteredProducts = products.filter(
     (p) =>
@@ -109,7 +175,7 @@ export default function App() {
 
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FCF8FF] selection:bg-pink-200 overflow-x-hidden">
+    <div className={`min-h-screen flex flex-col selection:bg-pink-200 overflow-x-hidden transition-colors duration-300 ${dark ? "bg-gray-950 text-white" : "bg-[#FCF8FF] text-gray-900"}`}>
 
       {/* Toast */}
       {toast && (
@@ -134,7 +200,7 @@ export default function App() {
             <div className="relative flex-grow md:w-80">
               <input
                 type="text" placeholder="Search magic..." value={searchQuery}
-                className="w-full p-4 px-8 rounded-[2rem] border-4 border-white bg-white/80 backdrop-blur-sm outline-none shadow-xl shadow-purple-100/50 focus:border-purple-200 transition-all text-sm italic"
+                className={`w-full p-4 px-8 rounded-[2rem] border-4 backdrop-blur-sm outline-none shadow-xl transition-all text-sm italic ${dark ? "bg-gray-800/80 border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 shadow-gray-900" : "bg-white/80 border-white text-gray-800 focus:border-purple-200 shadow-purple-100/50"}`}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
                   if (e.target.value.length > 0) changeView("search");
@@ -147,13 +213,20 @@ export default function App() {
                 <span className="absolute right-6 top-1/2 -translate-y-1/2 opacity-30 cursor-default">🔍</span>
               )}
             </div>
-            <button onClick={() => changeView("cart")} className="relative p-4 bg-white rounded-3xl border-4 border-white shadow-xl shadow-purple-100/50 hover:bg-purple-50 transition-all active:scale-90">
+            <button onClick={() => changeView("cart")} className={`relative p-4 rounded-3xl border-4 shadow-xl transition-all active:scale-90 ${dark ? "bg-gray-800 border-gray-700 hover:bg-gray-700 shadow-gray-900" : "bg-white border-white hover:bg-purple-50 shadow-purple-100/50"}`}>
               <span className="text-2xl">🧺</span>
               {cart.length > 0 && (
                 <span className="absolute -top-3 -right-3 bg-pink-500 text-white text-[10px] w-7 h-7 rounded-full flex items-center justify-center font-black animate-bounce shadow-lg border-2 border-white">
                   {cart.length}
                 </span>
               )}
+            </button>
+
+            {/* Settings button */}
+            <button
+              onClick={() => setSettingsOpen(true)}
+              className={`p-4 rounded-3xl border-4 shadow-xl transition-all active:scale-90 ${dark ? "bg-gray-800 border-gray-700 hover:bg-gray-700 shadow-gray-900" : "bg-white border-white hover:bg-purple-50 shadow-purple-100/50"}`}>
+              <span className="text-xl">⚙️</span>
             </button>
           </div>
         </header>
@@ -223,7 +296,13 @@ export default function App() {
           <ProductDetail product={selectedProduct} addToCart={addToCart}
             goBack={() => changeView(prevView)}
             navigateToCart={() => changeView("cart")}
-            navigateToCheckout={() => changeView("checkout")}
+            navigateToCheckout={() => {
+              if (!isLoggedIn) {
+                changeView("login");
+              } else {
+                changeView("checkout");
+              }
+            }}
           />
         )}
 
@@ -298,10 +377,16 @@ export default function App() {
                     {cart.length} {cart.length === 1 ? "item" : "items"} · Delivery & gift wrap calculated at checkout
                   </p>
                   <button
-                    onClick={() => changeView("checkout")}
+                    onClick={() => {
+                      if (!isLoggedIn) {
+                        changeView("login");
+                      } else {
+                        changeView("checkout");
+                      }
+                    }}
                     className="w-full py-6 bg-white text-purple-900 rounded-[2.5rem] font-black uppercase text-xs tracking-widest hover:bg-purple-50 transition-colors active:scale-95"
                   >
-                    Proceed to Checkout ✨
+                    {isLoggedIn ? "Proceed to Checkout ✨" : "Login to Checkout 🔐"}
                   </button>
                 </div>
               </div>
@@ -322,12 +407,28 @@ export default function App() {
         {view === "checkout" && (
           <OrderForm
             cart={cart}
+            customer={customer}
             goBack={() => changeView("cart")}
             onOrderSuccess={handleOrderSuccess}
           />
         )}
 
         {/* ── THANK YOU ──────────────────────────────────────── */}
+        {view === "login" && (
+          <LoginPage
+            setView={changeView}
+            redirectAfter={
+              prevView === 'checkout' || prevView === 'cart' || prevView === 'product-detail'
+                ? 'checkout'
+                : 'home'
+            }
+          />
+        )}
+
+        {view === "myorders" && (
+          <MyOrders setView={changeView} />
+        )}
+
         {view === "admin" && (
           <AdminDashboard goBack={() => changeView("home")} />
         )}
@@ -341,6 +442,13 @@ export default function App() {
       </main>
 
       {view !== "thankyou" && view !== "admin" && <Footer setView={changeView} />}
+
+      {/* Settings Panel */}
+      <SettingsPanel
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        setView={changeView}
+      />
 
       <div className="fixed -bottom-40 -left-40 w-[500px] h-[500px] bg-purple-200/30 rounded-full blur-[120px] -z-10 pointer-events-none" />
       <div className="fixed -top-40 -right-40 w-[500px] h-[500px] bg-pink-100/30 rounded-full blur-[120px] -z-10 pointer-events-none" />

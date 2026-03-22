@@ -8,7 +8,7 @@ const DELIVERY_CHARGE   = 70;
 const GIFT_WRAP_CHARGE  = 30;
 const FREE_GIFT_MIN     = 300;
 
-export default function OrderForm({ cart, goBack, onOrderSuccess }) {
+export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
   // ── Step: "summary" → "form" → "payment" ─────────────────
   const [step, setStep]           = useState("summary");
   const [loading, setLoading]     = useState(false);
@@ -21,14 +21,18 @@ export default function OrderForm({ cart, goBack, onOrderSuccess }) {
   const [giftMessage, setGiftMessage] = useState("");
 
   const [formData, setFormData] = useState({
-    name: "", phone: "", email: "", address: "",
-    transactionId: "", payerName: "", securityCode: "",
+    name:          customer?.name    || "",
+    phone:         customer?.phone   || "",
+    email:         customer?.email   || "",
+    address:       customer?.address || "",
+    transactionId: "",
+    payerName:     "",
+    securityCode:  "",
   });
 
   // ── ENV ───────────────────────────────────────────────────
   const upiId        = process.env.REACT_APP_UPI_ID          || "yourname@upi";
   const merchantName = process.env.REACT_APP_MERCHANT_NAME   || "ShimmerNest";
-  const sellerWhatsApp = process.env.REACT_APP_SELLER_PHONE  || "91XXXXXXXXXX";
   const apiUrl       = process.env.REACT_APP_API_URL         || "http://localhost:5000";
 
   // ── Pricing calculations ──────────────────────────────────
@@ -93,10 +97,6 @@ export default function OrderForm({ cart, goBack, onOrderSuccess }) {
 
     const orderId = `SN-${Date.now().toString().slice(-4)}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    const itemSummary = cart
-      .map((i) => `• ${i.name} (${i.selectedColor || "Default"}) x${i.qty} — ₹${i.price * i.qty}${i.note ? ` [Note: ${i.note}]` : ""}`)
-      .join("\n");
-
     // ── STEP 1: Save to DB ───────────────────────────────────
     let savedOrder;
     try {
@@ -128,61 +128,36 @@ export default function OrderForm({ cart, goBack, onOrderSuccess }) {
       return;
     }
 
-    // ── STEP 2: Send customer email ──────────────────────────
-    if (process.env.REACT_APP_EMAILJS_PUBLIC_KEY) {
-      try {
-        const orderDetailsText = cart
-          .map((i) => `${i.name} (${i.selectedColor || "Default"})${i.note ? ` — Note: ${i.note}` : ""}`)
-          .join("\n");
-        const quantityText = cart.map((i) => `x${i.qty}`).join("\n");
+    // ── STEP 2: Send customer email via EmailJS ────────────────
+    // Sends order confirmation to customer's email
+    try {
+      const orderDetailsText = cart
+        .map((i) => `${i.name} (${i.selectedColor || "Default"})${i.note ? ` — Note: ${i.note}` : ""}`)
+        .join("\n");
+      const quantityText = cart.map((i) => `x${i.qty}`).join("\n");
 
-        await emailjs.send(
-          process.env.REACT_APP_EMAILJS_SERVICE_ID,
-          process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
-          {
-            to_name:        formData.name.trim(),
-            to_email:       formData.email.trim(),
-            order_id:       orderId,
-            order_details:  orderDetailsText,
-            quantity:       quantityText,
-            amount:         grandTotal,
-            address:        formData.address.trim(),
-            transaction_id: utrClean,
-          },
-          process.env.REACT_APP_EMAILJS_PUBLIC_KEY
-        );
-      } catch (emailError) {
-        console.warn("EmailJS failed:", emailError);
-      }
+      await emailjs.send(
+        process.env.REACT_APP_EMAILJS_SERVICE_ID,
+        process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
+        {
+          to_name:        formData.name.trim(),
+          to_email:       formData.email.trim(),
+          order_id:       orderId,
+          order_details:  orderDetailsText,
+          quantity:       quantityText,
+          amount:         grandTotal,
+          address:        formData.address.trim(),
+          transaction_id: utrClean,
+        },
+        process.env.REACT_APP_EMAILJS_PUBLIC_KEY
+      );
+      console.log("✅ Email sent to customer:", formData.email.trim());
+    } catch (emailError) {
+      // Email failed — order is saved, we still continue to thank you page
+      console.warn("⚠️ EmailJS failed:", emailError?.text || emailError?.message || emailError);
     }
 
-    // ── STEP 3: WhatsApp to admin ────────────────────────────
-    const whatsappMsg = window.encodeURIComponent(
-      `🌸 *NEW ORDER — ${orderId}*\n` +
-      `━━━━━━━━━━━━━━━━━━━━━\n\n` +
-      `📦 *ITEMS ORDERED:*\n${itemSummary}\n\n` +
-      `💰 *ORDER CHARGES:*\n` +
-      `• Items Subtotal: ₹${subtotal}\n` +
-      (deliveryCharge > 0 ? `• Delivery Charge: ₹${deliveryCharge}\n` : `• Delivery: FREE 🎉\n`) +
-      (giftWrap ? `• Gift Wrapping: ₹${giftWrapCharge}${giftMessage ? ` | Message: "${giftMessage}"` : ""}\n` : "") +
-      `• *Grand Total: ₹${grandTotal}*\n\n` +
-      `━━━━━━━━━━━━━━━━━━━━━\n` +
-      `👤 *CUSTOMER DETAILS:*\n` +
-      `• Name: ${formData.name.trim()}\n` +
-      `• Phone: ${formData.phone.trim()}\n` +
-      `• Email: ${formData.email.trim()}\n` +
-      `• Address: ${formData.address.trim()}\n\n` +
-      `━━━━━━━━━━━━━━━━━━━━━\n` +
-      `💳 *PAYMENT DETAILS:*\n` +
-      `• UTR / Transaction ID: ${utrClean}\n` +
-      `• Bank Account Name: ${formData.payerName.trim()}\n` +
-      `• Method: UPI Manual\n` +
-      `• Status: Pending Verification ⏳\n\n` +
-      `✨ ShimmerNest Order System`
-    );
-    window.open(`https://wa.me/${sellerWhatsApp}?text=${whatsappMsg}`, "_blank", "noopener,noreferrer");
-
-    // ── STEP 4: Go to Thank You ──────────────────────────────
+    // ── STEP 3: Go to Thank You page ────────────────────────
     setLoading(false);
     if (onOrderSuccess) {
       onOrderSuccess({

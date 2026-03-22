@@ -7,6 +7,7 @@ const CATEGORIES = [
   { id: "totes",     name: "Crochet Tote Bags",     icon: "👜", gradient: "from-amber-50 to-yellow-50",  accent: "#d97706", desc: "Hand-knotted stylish carry-alls"        },
   { id: "hair",      name: "Hair Accessories",       icon: "🎀", gradient: "from-rose-100 to-pink-50",   accent: "#db2777", desc: "Floral clips, scrunchies & bandanas"   },
   { id: "bouquets",  name: "Crochet Bouquets",       icon: "💐", gradient: "from-red-50 to-orange-50",   accent: "#dc2626", desc: "Flowers that never fade"                },
+  { id: "wool",      name: "Wool Shopping",          icon: "🧶", gradient: "from-purple-50 to-violet-50", accent: "#7c3aed", desc: "50+ colours · 20gm & 100gm packs"       },
 ];
 
 export default function AllCategories({ setView, setActiveCat }) {
