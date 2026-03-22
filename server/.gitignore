@@ -16,3 +16,6 @@ yarn-debug.log*
 # ── Misc ─────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+
+#Removing node modules from git tracking
+node_modules/
