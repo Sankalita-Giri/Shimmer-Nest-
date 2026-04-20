@@ -1,5 +1,6 @@
 import React from 'react';
 import { products } from '../data';
+import { useTheme } from '../context/ThemeContext';
 
 const CATEGORIES = [
   { id: "keychains", name: "Crochet Keychains",     icon: "🔑", gradient: "from-violet-100 to-blue-50",  accent: "#7c3aed", desc: "Cute companions for your keys & bags" },
@@ -7,10 +8,10 @@ const CATEGORIES = [
   { id: "totes",     name: "Crochet Tote Bags",     icon: "👜", gradient: "from-amber-50 to-yellow-50",  accent: "#d97706", desc: "Hand-knotted stylish carry-alls"        },
   { id: "hair",      name: "Hair Accessories",       icon: "🎀", gradient: "from-rose-100 to-pink-50",   accent: "#db2777", desc: "Floral clips, scrunchies & bandanas"   },
   { id: "bouquets",  name: "Crochet Bouquets",       icon: "💐", gradient: "from-red-50 to-orange-50",   accent: "#dc2626", desc: "Flowers that never fade"                },
-  { id: "wool",      name: "Wool Shopping",          icon: "🧶", gradient: "from-purple-50 to-violet-50", accent: "#7c3aed", desc: "50+ colours · 20gm & 100gm packs"       },
 ];
 
 export default function AllCategories({ setView, setActiveCat }) {
+  const { dark } = useTheme();
   return (
     <div className="animate-fadeIn pb-20">
 
@@ -23,10 +24,10 @@ export default function AllCategories({ setView, setActiveCat }) {
           ← Back to Home
         </button>
         <p className="text-[9px] font-black text-purple-400 uppercase tracking-[0.4em] mb-2">What are you looking for?</p>
-        <h1 className="text-5xl font-black text-gray-900 tracking-tighter">
-          Shop All <span className="text-purple-600 italic font-medium">Collections</span>
+        <h1 className={`text-5xl font-black tracking-tighter ${dark ? 'text-white' : 'text-gray-900'}`}>
+          Shop All <span className="text-purple-500 italic font-medium">Collections</span>
         </h1>
-        <p className="text-gray-400 text-sm font-medium mt-3">
+        <p className={`text-sm font-medium mt-3 ${dark ? 'text-purple-300' : 'text-gray-400'}`}>
           Choose a category to explore our handmade creations 🧶
         </p>
       </div>
@@ -41,7 +42,7 @@ export default function AllCategories({ setView, setActiveCat }) {
             <div
               key={cat.id}
               onClick={() => { setActiveCat(cat.id); setView('subcat'); window.scrollTo(0, 0); }}
-              className={`bg-gradient-to-br ${cat.gradient} rounded-[3rem] border-4 border-white shadow-xl hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 cursor-pointer group p-6 md:p-8`}
+              className={`rounded-[3rem] border-4 shadow-xl hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 cursor-pointer group p-6 md:p-8 ${dark ? 'bg-gradient-to-br from-purple-950/80 to-gray-900/80 border-purple-800/40' : `bg-gradient-to-br ${cat.gradient} border-white`}`}
             >
               <div className="flex items-center gap-6">
 
@@ -50,8 +51,8 @@ export default function AllCategories({ setView, setActiveCat }) {
                   <div className="w-16 h-16 rounded-[1.5rem] bg-white/70 shadow-md flex items-center justify-center text-3xl mb-3">
                     {cat.icon}
                   </div>
-                  <h2 className="font-black text-gray-900 text-lg tracking-tight leading-tight">{cat.name}</h2>
-                  <p className="text-[10px] text-gray-500 font-medium mt-1 max-w-[140px]">{cat.desc}</p>
+                  <h2 className={`font-black text-lg tracking-tight leading-tight ${dark ? 'text-white' : 'text-gray-900'}`}>{cat.name}</h2>
+                  <p className={`text-[10px] font-medium mt-1 max-w-[140px] ${dark ? 'text-purple-300' : 'text-gray-500'}`}>{cat.desc}</p>
                   <div className="mt-3 flex items-center gap-1.5">
                     <span className="text-[9px] font-black uppercase tracking-widest group-hover:translate-x-1 transition-transform"
                       style={{ color: cat.accent }}>
@@ -90,7 +91,7 @@ export default function AllCategories({ setView, setActiveCat }) {
 
                   {/* Product count + price range */}
                   <div className="flex items-center gap-3 mt-3">
-                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                    <span className={`text-[9px] font-black uppercase tracking-widest ${dark ? 'text-purple-400' : 'text-gray-400'}`}>
                       {catProducts.length > 0 ? `${catProducts.length} items` : "Coming soon"}
                     </span>
                     {catProducts.length > 0 && (

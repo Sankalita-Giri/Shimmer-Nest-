@@ -1,12 +1,14 @@
 import React from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Footer({ setView }) {
+  const { dark } = useTheme();
   const currentYear = new Date().getFullYear();
   const sellerPhone = process.env.REACT_APP_SELLER_PHONE || '';
   const instagramHandle = process.env.REACT_APP_INSTAGRAM_HANDLE || '_.shimmernest._';
 
   return (
-    <footer className="border-t border-purple-50 bg-white/50 backdrop-blur-sm">
+    <footer className={`border-t backdrop-blur-sm ${dark ? 'border-purple-900/40 bg-gray-950/80' : 'border-purple-50 bg-white/50'}`}>
 
       {/* ── WHY SHIMMERNEST ── */}
       <div className="px-6 pt-16 pb-12 max-w-5xl mx-auto">
@@ -47,10 +49,10 @@ export default function Footer({ setView }) {
 
           {/* Brand */}
           <div className="space-y-4">
-            <h2 className="text-3xl font-black text-purple-700 tracking-tighter">
-              ShimmerNest<span className="text-pink-300">.</span>
+            <h2 className="text-3xl font-black text-purple-600 tracking-tighter">
+              ShimmerNest<span className="text-pink-400">.</span>
             </h2>
-            <p className="text-gray-400 text-sm font-medium leading-relaxed">
+            <p className={`text-sm font-medium leading-relaxed ${dark ? 'text-purple-300' : 'text-gray-400'}`}>
               Handmade crochet treasures crafted with love and extra shimmer. 💜
             </p>
             <div className="flex space-x-3 pt-2">
@@ -63,8 +65,8 @@ export default function Footer({ setView }) {
 
           {/* Shop */}
           <div>
-            <h4 className="text-xs font-black text-gray-800 uppercase tracking-[0.2em] mb-5">Shop</h4>
-            <ul className="space-y-3 text-sm font-bold text-gray-400">
+            <h4 className={`text-xs font-black uppercase tracking-[0.2em] mb-5 ${dark ? 'text-purple-200' : 'text-gray-800'}`}>Shop</h4>
+            <ul className={`space-y-3 text-sm font-bold ${dark ? 'text-purple-400' : 'text-gray-400'}`}>
               <li><button onClick={() => { setView('home'); window.scrollTo(0,0); }} className="hover:text-purple-600 transition-colors">Home</button></li>
               <li><button onClick={() => { setView('categories'); window.scrollTo(0,0); }} className="hover:text-purple-600 transition-colors">All Products</button></li>
               <li><button onClick={() => { setView('cart'); window.scrollTo(0,0); }} className="hover:text-purple-600 transition-colors">My Basket</button></li>
@@ -73,8 +75,8 @@ export default function Footer({ setView }) {
 
           {/* Contact */}
           <div>
-            <h4 className="text-xs font-black text-gray-800 uppercase tracking-[0.2em] mb-5">Contact</h4>
-            <ul className="space-y-3 text-sm font-bold text-gray-400">
+            <h4 className={`text-xs font-black uppercase tracking-[0.2em] mb-5 ${dark ? 'text-purple-200' : 'text-gray-800'}`}>Contact</h4>
+            <ul className={`space-y-3 text-sm font-bold ${dark ? 'text-purple-400' : 'text-gray-400'}`}>
               <li><a href="mailto:support@shimmernest.com" className="hover:text-purple-600 transition-colors normal-case">support@shimmernest.com</a></li>
               <li><a href={"https://instagram.com/" + instagramHandle} target="_blank" rel="noreferrer" className="hover:text-purple-600 transition-colors">@{instagramHandle}</a></li>
               <li><a href={sellerPhone ? "https://wa.me/" + sellerPhone : '#'} target="_blank" rel="noreferrer" className="hover:text-purple-600 transition-colors">WhatsApp Us</a></li>
@@ -83,8 +85,8 @@ export default function Footer({ setView }) {
 
           {/* Policies */}
           <div>
-            <h4 className="text-xs font-black text-gray-800 uppercase tracking-[0.2em] mb-5">Policies</h4>
-            <ul className="space-y-3 text-sm font-bold text-gray-400">
+            <h4 className={`text-xs font-black uppercase tracking-[0.2em] mb-5 ${dark ? 'text-purple-200' : 'text-gray-800'}`}>Policies</h4>
+            <ul className={`space-y-3 text-sm font-bold ${dark ? 'text-purple-400' : 'text-gray-400'}`}>
               <li className="flex items-center gap-2"><span>📦</span> 5–7 Days Delivery</li>
               <li className="flex items-center gap-2"><span>🧶</span> 100% Handmade</li>
               <li className="flex items-center gap-2"><span>🎀</span> No Returns / Refunds</li>
@@ -95,7 +97,7 @@ export default function Footer({ setView }) {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-purple-50 pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] font-black text-purple-200 uppercase tracking-widest">
+        <div className={`border-t pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] font-black uppercase tracking-widest ${dark ? 'border-purple-900/40 text-purple-600' : 'border-purple-50 text-purple-200'}`}>
           <p>© {currentYear} ShimmerNest Studio. All Rights Reserved.</p>
           <p className="mt-2 md:mt-0">Made with 💜 by your favourite crochet enthusiast</p>
         </div>

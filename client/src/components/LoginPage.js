@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 export default function LoginPage({ setView, redirectAfter }) {
   const { login } = useAuth();
+  const { dark } = useTheme();
   const [mode, setMode]       = useState('login'); // 'login' | 'register'
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
@@ -94,10 +96,10 @@ export default function LoginPage({ setView, redirectAfter }) {
       {/* Header */}
       <div className="text-center mb-8">
         <div className="text-5xl mb-3">{mode === 'login' ? '💜' : '🌸'}</div>
-        <h1 className="text-3xl font-black text-gray-900 tracking-tighter">
+        <h1 className={`text-3xl font-black tracking-tighter ${dark ? 'text-white' : 'text-gray-900'}`}>
           {mode === 'login' ? 'Welcome Back!' : 'Create Account'}
         </h1>
-        <p className="text-gray-400 text-sm font-medium mt-2">
+        <p className={`text-sm font-medium mt-2 ${dark ? 'text-purple-300' : 'text-gray-400'}`}>
           {redirectAfter === 'checkout'
             ? '🔐 Please login or register to place your order'
             : mode === 'login'
@@ -114,16 +116,16 @@ export default function LoginPage({ setView, redirectAfter }) {
       </div>
 
       {/* Card */}
-      <div className="bg-white rounded-[3rem] shadow-2xl border-4 border-white p-8">
+      <div className={`rounded-[3rem] shadow-2xl border-4 p-8 ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-white'}`}>
 
         {/* Tab switcher */}
-        <div className="flex bg-gray-50 rounded-2xl p-1 mb-6">
+        <div className={`flex rounded-2xl p-1 mb-6 ${dark ? 'bg-gray-800' : 'bg-gray-50'}`}>
           <button onClick={() => { setMode('login'); setError(''); }}
-            className={`flex-1 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${mode === 'login' ? 'bg-white text-purple-700 shadow-sm' : 'text-gray-400'}`}>
+            className={`flex-1 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${mode === 'login' ? (dark ? 'bg-gray-700 text-purple-400 shadow-sm' : 'bg-white text-purple-700 shadow-sm') : (dark ? 'text-gray-500' : 'text-gray-400')}`}>
             Login
           </button>
           <button onClick={() => { setMode('register'); setError(''); }}
-            className={`flex-1 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${mode === 'register' ? 'bg-white text-purple-700 shadow-sm' : 'text-gray-400'}`}>
+            className={`flex-1 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${mode === 'register' ? (dark ? 'bg-gray-700 text-purple-400 shadow-sm' : 'bg-white text-purple-700 shadow-sm') : (dark ? 'text-gray-500' : 'text-gray-400')}`}>
             Register
           </button>
         </div>
@@ -136,17 +138,17 @@ export default function LoginPage({ setView, redirectAfter }) {
               <div>
                 <input name="name" placeholder="Your Full Name" value={form.name}
                   onChange={handleChange}
-                  className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-purple-200 outline-none text-sm font-medium" />
+                  className={`w-full p-4 rounded-2xl border-2 focus:border-purple-400 outline-none text-sm font-medium ${dark ? 'bg-gray-800 border-gray-700 text-purple-100 placeholder-purple-600' : 'bg-gray-50 border-transparent text-gray-800'}`} />
               </div>
               <div>
                 <input name="phone" placeholder="WhatsApp Number (10 digits)" value={form.phone}
                   onChange={handleChange} maxLength={10} inputMode="numeric"
-                  className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-purple-200 outline-none text-sm font-medium" />
+                  className={`w-full p-4 rounded-2xl border-2 focus:border-purple-400 outline-none text-sm font-medium ${dark ? 'bg-gray-800 border-gray-700 text-purple-100 placeholder-purple-600' : 'bg-gray-50 border-transparent text-gray-800'}`} />
               </div>
               <div>
                 <textarea name="address" placeholder="Delivery Address + Pincode (optional)" value={form.address}
                   onChange={handleChange} rows={2}
-                  className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-purple-200 outline-none text-sm font-medium resize-none" />
+                  className={`w-full p-4 rounded-2xl border-2 focus:border-purple-400 outline-none text-sm font-medium resize-none ${dark ? 'bg-gray-800 border-gray-700 text-purple-100 placeholder-purple-600' : 'bg-gray-50 border-transparent text-gray-800'}`} />
               </div>
             </>
           )}
@@ -155,18 +157,18 @@ export default function LoginPage({ setView, redirectAfter }) {
           <div>
             <input name="email" type="email" placeholder="Email Address" value={form.email}
               onChange={handleChange}
-              className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-purple-200 outline-none text-sm font-medium" />
+              className={`w-full p-4 rounded-2xl border-2 focus:border-purple-400 outline-none text-sm font-medium ${dark ? 'bg-gray-800 border-gray-700 text-purple-100 placeholder-purple-600' : 'bg-gray-50 border-transparent text-gray-800'}`} />
           </div>
           <div>
             <input name="password" type="password" placeholder="Password" value={form.password}
               onChange={handleChange}
-              className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-purple-200 outline-none text-sm font-medium" />
+              className={`w-full p-4 rounded-2xl border-2 focus:border-purple-400 outline-none text-sm font-medium ${dark ? 'bg-gray-800 border-gray-700 text-purple-100 placeholder-purple-600' : 'bg-gray-50 border-transparent text-gray-800'}`} />
           </div>
           {mode === 'register' && (
             <div>
               <input name="confirmPassword" type="password" placeholder="Confirm Password"
                 value={form.confirmPassword} onChange={handleChange}
-                className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-purple-200 outline-none text-sm font-medium" />
+                className={`w-full p-4 rounded-2xl border-2 focus:border-purple-400 outline-none text-sm font-medium ${dark ? 'bg-gray-800 border-gray-700 text-purple-100 placeholder-purple-600' : 'bg-gray-50 border-transparent text-gray-800'}`} />
             </div>
           )}
 
@@ -186,8 +188,8 @@ export default function LoginPage({ setView, redirectAfter }) {
 
           {/* No refund notice on register */}
           {mode === 'register' && (
-            <div className="bg-purple-50 rounded-2xl p-3 border border-purple-100">
-              <p className="text-[9px] font-bold text-purple-500 uppercase tracking-widest text-center leading-relaxed">
+            <div className={`rounded-2xl p-3 border ${dark ? 'bg-purple-950/50 border-purple-800/40' : 'bg-purple-50 border-purple-100'}`}>
+              <p className={`text-[9px] font-bold uppercase tracking-widest text-center leading-relaxed ${dark ? 'text-purple-400' : 'text-purple-500'}`}>
                 🧶 All items are handmade to order · No cancellations or refunds · 5–7 working days
               </p>
             </div>

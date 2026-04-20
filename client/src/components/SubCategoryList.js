@@ -1,7 +1,9 @@
 import React from 'react';
 import { subCategories } from '../data';
+import { useTheme } from '../context/ThemeContext';
 
 export default function SubCategoryList({ activeCat, setSubCat, setView, goBack }) {
+  const { dark } = useTheme();
   const currentSubCats = subCategories[activeCat] || [];
 
   const singular = activeCat
@@ -29,25 +31,25 @@ export default function SubCategoryList({ activeCat, setSubCat, setView, goBack 
             <span className="group-hover:-translate-x-1 transition-transform mr-2">←</span>
             Back to Shop
           </button>
-          <h2 className="text-5xl font-black text-gray-800 italic capitalize tracking-tighter">
+          <h2 className={`text-5xl font-black italic capitalize tracking-tighter ${dark ? 'text-white' : 'text-gray-800'}`}>
             {catName} <span className="text-purple-600 font-medium">Studio</span>
           </h2>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2 ml-1">
+          <p className={`text-[10px] font-bold uppercase tracking-widest mt-2 ml-1 ${dark ? 'text-purple-400' : 'text-gray-400'}`}>
             Explore our handmade {catName.toLowerCase()} varieties
           </p>
         </div>
       </div>
 
       {currentSubCats.length === 0 ? (
-        <div className="text-center py-32 bg-white/50 backdrop-blur-sm rounded-[4rem] border-4 border-dashed border-purple-100 flex flex-col items-center">
+        <div className={`text-center py-32 backdrop-blur-sm rounded-[4rem] border-4 border-dashed flex flex-col items-center ${dark ? 'bg-purple-950/30 border-purple-800/40' : 'bg-white/50 border-purple-100'}`}>
           <div className="relative">
             <div className="w-28 h-28 bg-purple-50 rounded-full flex items-center justify-center text-6xl mb-8 animate-bounce">
               🧶
             </div>
             <div className="absolute -top-2 -right-2 w-8 h-8 bg-pink-400 rounded-full border-4 border-white animate-ping"></div>
           </div>
-          <h3 className="text-3xl font-black text-gray-800 italic mb-3 tracking-tighter">Coming Soon...</h3>
-          <p className="text-gray-400 font-bold text-[10px] uppercase tracking-[0.2em] max-w-[280px] mx-auto leading-relaxed opacity-70">
+          <h3 className={`text-3xl font-black italic mb-3 tracking-tighter ${dark ? 'text-white' : 'text-gray-800'}`}>Coming Soon...</h3>
+          <p className={`font-bold text-[10px] uppercase tracking-[0.2em] max-w-[280px] mx-auto leading-relaxed opacity-70 ${dark ? 'text-purple-300' : 'text-gray-400'}`}>
             We're working on something magical for this category!
           </p>
           <button
@@ -85,15 +87,15 @@ export default function SubCategoryList({ activeCat, setSubCat, setView, goBack 
                   </div>
                 </div>
               </div>
-              <h3 className="font-black text-gray-800 uppercase tracking-tighter text-sm md:text-base group-hover:text-purple-600 transition-colors">
+              <h3 className={`font-black uppercase tracking-tighter text-sm md:text-base group-hover:text-purple-600 transition-colors ${dark ? 'text-purple-100' : 'text-gray-800'}`}>
                 {sub.name}
               </h3>
               {sub.desc ? (
-                <p className="text-[9px] font-bold text-gray-300 uppercase tracking-[0.3em] mt-1 group-hover:text-purple-300 transition-colors">
+                <p className={`text-[9px] font-bold uppercase tracking-[0.3em] mt-1 group-hover:text-purple-300 transition-colors ${dark ? 'text-purple-400' : 'text-gray-300'}`}>
                   {sub.desc}
                 </p>
               ) : (
-                <p className="text-[9px] font-bold text-gray-300 uppercase tracking-[0.3em] mt-1 group-hover:text-purple-300 transition-colors">
+                <p className={`text-[9px] font-bold uppercase tracking-[0.3em] mt-1 group-hover:text-purple-300 transition-colors ${dark ? 'text-purple-400' : 'text-gray-300'}`}>
                   Hand-Knotted Selection
                 </p>
               )}

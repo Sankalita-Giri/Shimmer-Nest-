@@ -109,9 +109,16 @@ textarea:focus-visible {
 
 /* ── Dark Mode ─────────────────────────────────────────────── */
 .dark body {
-  background-color: #030712 !important;
-  color: #f9fafb !important;
+  background-color: #0a0514 !important;
+  background-image: linear-gradient(160deg, #0a0514 0%, #130a2e 40%, #0d0620 100%) !important;
+  background-size: unset !important;
+  animation: none !important;
+  color: #f3e8ff !important;
 }
-.dark ::-webkit-scrollbar-track { background: #111827; }
+.dark ::-webkit-scrollbar-track { background: #0f0820; }
 .dark ::-webkit-scrollbar-thumb { background: linear-gradient(#4f1dbb, #7c3aed); }
 .dark ::selection { background: #7c3aed; color: #fff; }
+.dark .glass-card {
+  background: rgba(124, 58, 237, 0.08) !important;
+  border-color: rgba(124, 58, 237, 0.15) !important;
+}

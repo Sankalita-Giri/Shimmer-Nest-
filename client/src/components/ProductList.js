@@ -1,7 +1,9 @@
 import React from 'react';
 import { products, subCategories } from "../data";
+import { useTheme } from '../context/ThemeContext';
 
 export default function ProductList({ category, subCat, setSelectedProduct, setView, goBack }) {
+  const { dark } = useTheme();
 
   const items = products.filter(p =>
     p.category?.toLowerCase() === category?.toLowerCase() &&
@@ -24,15 +26,15 @@ export default function ProductList({ category, subCat, setSelectedProduct, setV
             <span className="group-hover:-translate-x-1 transition-transform">←</span>
             Back to {category}
           </button>
-          <h2 className="text-5xl font-black text-gray-800 tracking-tighter capitalize italic leading-none">
-            {subCatName}<span className="text-pink-300">.</span>
+          <h2 className={`text-5xl font-black tracking-tighter capitalize italic leading-none ${dark ? 'text-white' : 'text-gray-800'}`}>
+            {subCatName}<span className="text-pink-400">.</span>
           </h2>
         </div>
 
         {items.length > 0 && (
-          <div className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm px-5 py-2.5 rounded-full border-2 border-purple-50 shadow-sm self-start md:self-auto">
+          <div className={`inline-flex items-center space-x-2 backdrop-blur-sm px-5 py-2.5 rounded-full border-2 shadow-sm self-start md:self-auto ${dark ? 'bg-purple-950/60 border-purple-800/50' : 'bg-white/80 border-purple-50'}`}>
             <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-            <p className="text-gray-500 font-black text-[10px] uppercase tracking-widest">
+            <p className={`font-black text-[10px] uppercase tracking-widest ${dark ? 'text-purple-300' : 'text-gray-500'}`}>
               {items.length} {items.length === 1 ? 'Magic Item' : 'Treasures'} Found
             </p>
           </div>
@@ -56,7 +58,7 @@ export default function ProductList({ category, subCat, setSelectedProduct, setV
                 }}
                 className={`group ${outOfStock ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
               >
-                <div className="bg-white p-4 rounded-[3rem] shadow-xl border-4 border-white transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-purple-100 group-hover:rotate-[-1deg] relative overflow-hidden">
+                <div className={`p-4 rounded-[3rem] shadow-xl border-4 transition-all duration-500 group-hover:-translate-y-2 group-hover:rotate-[-1deg] relative overflow-hidden ${dark ? 'bg-gray-900 border-purple-900/40 group-hover:shadow-purple-900' : 'bg-white border-white group-hover:shadow-purple-100'}`}>
 
                   <div className="relative aspect-square rounded-[2.2rem] overflow-hidden mb-6 bg-gray-50 shadow-inner">
 
@@ -88,13 +90,13 @@ export default function ProductList({ category, subCat, setSelectedProduct, setV
                   </div>
 
                   <div className="text-center pb-2">
-                    <h3 className="font-black text-gray-800 tracking-tight text-base md:text-lg mb-1 truncate px-2">
+                    <h3 className={`font-black tracking-tight text-base md:text-lg mb-1 truncate px-2 ${dark ? 'text-purple-100' : 'text-gray-800'}`}>
                       {item.name}
                     </h3>
 
                     <div className="flex justify-center items-center space-x-1.5 mb-3">
                       <span className="text-yellow-400 text-xs">★</span>
-                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
+                      <span className={`text-[10px] font-bold uppercase tracking-tighter ${dark ? 'text-purple-400' : 'text-gray-400'}`}>
                         {item.rating || "5.0"}
                         <span className="opacity-40 mx-1">|</span>
                         {item.reviews || "12"} Loves
@@ -105,11 +107,12 @@ export default function ProductList({ category, subCat, setSelectedProduct, setV
                       ₹{item.price}
                     </p>
 
-                    <div className={`w-full py-3.5 rounded-2xl font-black text-[9px] uppercase tracking-[0.2em] transition-all duration-300 ${
-                      outOfStock
+                    <div className={`w-full py-3.5 rounded-2xl font-black text-[9px] uppercase tracking-[0.2em] transition-all duration-300 ${outOfStock
                         ? 'bg-gray-100 text-gray-300'
-                        : 'bg-gray-50 text-gray-400 group-hover:bg-purple-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-purple-200'
-                    }`}>
+                        : dark
+                          ? 'bg-purple-900/50 text-purple-400 group-hover:bg-purple-600 group-hover:text-white group-hover:shadow-lg'
+                          : 'bg-gray-50 text-gray-400 group-hover:bg-purple-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-purple-200'
+                      }`}>
                       {outOfStock ? 'Sold Out 😢' : 'Adopt Me ✨'}
                     </div>
                   </div>
@@ -120,17 +123,17 @@ export default function ProductList({ category, subCat, setSelectedProduct, setV
         </div>
       ) : (
         /* Empty / Coming Soon State */
-        <div className="text-center py-32 bg-white/50 backdrop-blur-sm rounded-[4rem] border-4 border-dashed border-purple-100 flex flex-col items-center">
+        <div className={`text-center py-32 backdrop-blur-sm rounded-[4rem] border-4 border-dashed flex flex-col items-center ${dark ? 'bg-purple-950/30 border-purple-800/40' : 'bg-white/50 border-purple-100'}`}>
           <div className="relative">
-            <div className="w-28 h-28 bg-purple-50 rounded-full flex items-center justify-center text-6xl mb-8 animate-bounce">
+            <div className={`w-28 h-28 rounded-full flex items-center justify-center text-6xl mb-8 animate-bounce ${dark ? 'bg-purple-900/60' : 'bg-purple-50'}`}>
               🧶
             </div>
             <div className="absolute -top-2 -right-2 w-8 h-8 bg-pink-400 rounded-full border-4 border-white animate-ping"></div>
           </div>
-          <h3 className="text-3xl font-black text-gray-800 italic mb-3 tracking-tighter">
+          <h3 className={`text-3xl font-black italic mb-3 tracking-tighter ${dark ? 'text-white' : 'text-gray-800'}`}>
             Patience is Magic...
           </h3>
-          <p className="text-gray-400 font-bold text-[10px] uppercase tracking-[0.2em] max-w-[280px] mx-auto leading-relaxed opacity-70">
+          <p className={`font-bold text-[10px] uppercase tracking-[0.2em] max-w-[280px] mx-auto leading-relaxed opacity-70 ${dark ? 'text-purple-300' : 'text-gray-400'}`}>
             Our tiny hands are currently crocheting <br />
             new <span className="text-purple-400">{subCatName}</span> designs just for you!
           </p>

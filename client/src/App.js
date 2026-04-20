@@ -261,8 +261,8 @@ export default function App() {
         {view === "search" && (
           <div className="animate-fadeIn">
             <div className="mb-10">
-              <h2 className="text-3xl font-black text-gray-800 italic">Results for "{searchQuery}"</h2>
-              <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-2">
+              <h2 className={`text-3xl font-black italic ${dark ? 'text-white' : 'text-gray-800'}`}>Results for "{searchQuery}"</h2>
+              <p className={`text-xs font-bold uppercase tracking-widest mt-2 ${dark ? 'text-purple-400' : 'text-gray-400'}`}>
                 {filteredProducts.length} {filteredProducts.length === 1 ? "item" : "items"} found
               </p>
             </div>
@@ -270,7 +270,7 @@ export default function App() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                 {filteredProducts.map((prod) => (
                   <div key={prod.id} onClick={() => { setSelectedProduct(prod); changeView("product-detail"); }}
-                    className="bg-white p-4 rounded-[3rem] shadow-xl border-4 border-white cursor-pointer hover:-translate-y-2 transition-all group"
+                    className={`p-4 rounded-[3rem] shadow-xl border-4 cursor-pointer hover:-translate-y-2 transition-all group ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-white'}`}
                   >
                     <div className="relative aspect-square overflow-hidden rounded-[2.2rem] mb-4">
                       <img src={prod.image} alt={prod.name}
@@ -278,15 +278,15 @@ export default function App() {
                         onError={(e) => { e.target.src = "https://placehold.co/400x400?text=ShimmerNest"; }}
                       />
                     </div>
-                    <h3 className="font-black text-gray-800 text-center truncate px-2">{prod.name}</h3>
+                    <h3 className={`font-black text-center truncate px-2 ${dark ? 'text-purple-100' : 'text-gray-800'}`}>{prod.name}</h3>
                     <p className="text-purple-500 font-black text-center italic mt-1">₹{prod.price}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-32 bg-white/50 rounded-[4rem] border-4 border-dashed border-purple-100">
+              <div className={`text-center py-32 rounded-[4rem] border-4 border-dashed ${dark ? 'bg-purple-950/30 border-purple-800/40' : 'bg-white/50 border-purple-100'}`}>
                 <div className="text-6xl mb-6">🔍</div>
-                <h3 className="text-2xl font-black text-gray-800 italic mb-2">No Results Found</h3>
+                <h3 className={`text-2xl font-black italic mb-2 ${dark ? 'text-white' : 'text-gray-800'}`}>No Results Found</h3>
               </div>
             )}
           </div>
@@ -309,21 +309,26 @@ export default function App() {
         {/* ── CART ───────────────────────────────────────────── */}
         {view === "cart" && (
           <div className="animate-fadeIn max-w-2xl mx-auto">
-            <h2 className="text-5xl font-black text-gray-800 italic mb-12">Your Basket<span className="text-pink-400">.</span></h2>
+            <button onClick={() => changeView('home')}
+              className="mb-6 text-purple-400 font-black text-[10px] uppercase tracking-widest hover:text-purple-500 transition-colors flex items-center gap-1">
+              <span className="group-hover:-translate-x-1 transition-transform">←</span> Continue Shopping
+            </button>
+            <h2 className={`text-5xl font-black italic mb-12 ${dark ? 'text-white' : 'text-gray-800'}`}>Your Basket<span className="text-pink-400">.</span></h2>
+
 
             {cart.length > 0 ? (
               <div className="space-y-6">
 
                 {/* Perk Progress Bar */}
                 {subtotal < FREE_SHIPPING_MIN && (
-                  <div className="bg-white rounded-[2rem] border-4 border-white shadow-lg p-5">
+                  <div className={`rounded-[2rem] border-4 shadow-lg p-5 ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-white'}`}>
                     <div className="flex justify-between items-center mb-2">
                       <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest">
                         {amountToFreeShipping > 0
                           ? `Add ₹${amountToFreeShipping} more for FREE shipping! 🚚`
                           : "You've unlocked FREE shipping! 🎉"}
                       </p>
-                      <p className="text-[9px] font-black text-gray-400">₹{subtotal} / ₹{FREE_SHIPPING_MIN}</p>
+                      <p className={`text-[9px] font-black ${dark ? 'text-purple-400' : 'text-gray-400'}`}>₹{subtotal} / ₹{FREE_SHIPPING_MIN}</p>
                     </div>
                     <div className="w-full h-2 bg-purple-50 rounded-full overflow-hidden">
                       <div
@@ -347,19 +352,19 @@ export default function App() {
 
                 {/* Cart Items */}
                 {cart.map((item) => (
-                  <div key={item.cartId} className="flex items-center bg-white p-6 rounded-[3rem] shadow-xl border-4 border-white gap-4">
+                  <div key={item.cartId} className={`flex items-center p-6 rounded-[3rem] shadow-xl border-4 gap-4 ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-white'}`}>
                     <img src={item.image} alt={item.name} className="w-24 h-24 rounded-[2rem] object-cover flex-none"
                       onError={(e) => { e.target.src = "https://placehold.co/100x100?text=✨"; }}
                     />
                     <div className="flex-grow min-w-0">
-                      <h4 className="font-black text-gray-800 text-lg truncate">{item.name}</h4>
+                      <h4 className={`font-black text-lg truncate ${dark ? 'text-purple-100' : 'text-gray-800'}`}>{item.name}</h4>
                       <p className="text-[10px] text-purple-400 font-black uppercase mt-1">
                         {item.selectedColor}{item.note && ` • "${item.note}"`}
                       </p>
                       <div className="flex items-center gap-3 mt-3">
-                        <button onClick={() => updateQty(item.cartId, item.qty - 1)} className="w-7 h-7 rounded-full bg-purple-50 text-purple-400 font-black hover:bg-purple-100 transition-colors">−</button>
-                        <span className="font-black text-gray-800 text-sm">{item.qty}</span>
-                        <button onClick={() => updateQty(item.cartId, item.qty + 1)} className="w-7 h-7 rounded-full bg-purple-50 text-purple-400 font-black hover:bg-purple-100 transition-colors">+</button>
+                        <button onClick={() => updateQty(item.cartId, item.qty - 1)} className={`w-7 h-7 rounded-full font-black hover:bg-purple-200 transition-colors ${dark ? 'bg-purple-900/60 text-purple-300' : 'bg-purple-50 text-purple-400'}`}>−</button>
+                        <span className={`font-black text-sm ${dark ? 'text-purple-100' : 'text-gray-800'}`}>{item.qty}</span>
+                        <button onClick={() => updateQty(item.cartId, item.qty + 1)} className={`w-7 h-7 rounded-full font-black hover:bg-purple-200 transition-colors ${dark ? 'bg-purple-900/60 text-purple-300' : 'bg-purple-50 text-purple-400'}`}>+</button>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-3 flex-none">
@@ -391,10 +396,10 @@ export default function App() {
                 </div>
               </div>
             ) : (
-              <div className="text-center py-32 bg-white rounded-[5rem] shadow-2xl border-8 border-white">
-                <div className="text-6xl mb-6">🧺</div>
-                <h3 className="text-2xl font-black text-gray-800 italic">Your nest is empty!</h3>
-                <p className="text-gray-400 text-sm font-medium mt-3 mb-8">Fill it with handmade magic ✨</p>
+              <div className={`text-center py-32 rounded-[5rem] shadow-2xl border-8 ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-white'}`}>
+                <div className="text-6xl mb-6">🧵</div>
+                <h3 className={`text-2xl font-black italic ${dark ? 'text-white' : 'text-gray-800'}`}>Your nest is empty!</h3>
+                <p className={`text-sm font-medium mt-3 mb-8 ${dark ? 'text-purple-300' : 'text-gray-400'}`}>Fill it with handmade magic ✨</p>
                 <button onClick={() => changeView("home")} className="px-10 py-4 bg-purple-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-purple-700 transition-colors active:scale-95">
                   Start Shopping ✨
                 </button>

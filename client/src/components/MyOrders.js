@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -22,6 +23,7 @@ const PAYMENT_COLORS = {
 
 export default function MyOrders({ setView }) {
   const { customer, logout, fetchMyOrders, getToken, updateCustomer } = useAuth();
+  const { dark } = useTheme();
   const [orders, setOrders]         = useState([]);
   const [loading, setLoading]       = useState(true);
   const [selected, setSelected]     = useState(null);
@@ -88,11 +90,11 @@ export default function MyOrders({ setView }) {
             className="text-purple-300 font-black text-[10px] uppercase tracking-widest hover:text-purple-500 transition-colors mb-2 block">
             ← Back to Shop
           </button>
-          <h1 className="text-3xl font-black text-gray-900 tracking-tighter">
+          <h1 className={`text-3xl font-black tracking-tighter ${dark ? 'text-white' : 'text-gray-900'}`}>
             My Account 💜
           </h1>
-          <p className="text-gray-400 text-sm font-medium mt-1">
-            Welcome back, <span className="text-purple-600 font-black">{customer?.name}</span>!
+          <p className={`text-sm font-medium mt-1 ${dark ? 'text-purple-300' : 'text-gray-400'}`}>
+            Welcome back, <span className="text-purple-500 font-black">{customer?.name}</span>!
           </p>
         </div>
         <button onClick={handleLogout}
@@ -102,13 +104,13 @@ export default function MyOrders({ setView }) {
       </div>
 
       {/* Tabs */}
-      <div className="flex bg-gray-50 rounded-2xl p-1 mb-8">
+      <div className={`flex rounded-2xl p-1 mb-8 ${dark ? 'bg-gray-800' : 'bg-gray-50'}`}>
         <button onClick={() => setActiveTab('orders')}
-          className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'orders' ? 'bg-white text-purple-700 shadow-sm' : 'text-gray-400'}`}>
+          className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'orders' ? (dark ? 'bg-gray-700 text-purple-400 shadow-sm' : 'bg-white text-purple-700 shadow-sm') : (dark ? 'text-gray-500' : 'text-gray-400')}`}>
           📦 My Orders
         </button>
         <button onClick={() => setActiveTab('profile')}
-          className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'profile' ? 'bg-white text-purple-700 shadow-sm' : 'text-gray-400'}`}>
+          className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'profile' ? (dark ? 'bg-gray-700 text-purple-400 shadow-sm' : 'bg-white text-purple-700 shadow-sm') : (dark ? 'text-gray-500' : 'text-gray-400')}`}>
           👤 My Profile
         </button>
       </div>
@@ -122,10 +124,10 @@ export default function MyOrders({ setView }) {
               <p className="text-gray-400 font-bold text-sm">Loading your orders...</p>
             </div>
           ) : orders.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-[3rem] shadow-xl border-4 border-white">
+            <div className={`text-center py-20 rounded-[3rem] shadow-xl border-4 ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-white'}`}>
               <div className="text-6xl mb-4">📭</div>
-              <h3 className="text-xl font-black text-gray-800 italic mb-3">No orders yet!</h3>
-              <p className="text-gray-400 text-sm font-medium mb-8">Your orders will appear here once you shop.</p>
+              <h3 className={`text-xl font-black italic mb-3 ${dark ? 'text-white' : 'text-gray-800'}`}>No orders yet!</h3>
+              <p className={`text-sm font-medium mb-8 ${dark ? 'text-purple-300' : 'text-gray-400'}`}>Your orders will appear here once you shop.</p>
               <button onClick={() => setView('home')}
                 className="px-8 py-4 bg-purple-600 text-white rounded-full font-black text-xs uppercase tracking-widest hover:bg-purple-700 active:scale-95 transition-all">
                 Start Shopping ✨
@@ -138,12 +140,16 @@ export default function MyOrders({ setView }) {
                   {/* Order Card */}
                   <div
                     onClick={() => setSelected(selected?._id === order._id ? null : order)}
-                    className={`bg-white rounded-[2.5rem] border-4 p-6 cursor-pointer transition-all shadow-lg ${selected?._id === order._id ? 'border-purple-300 shadow-purple-100' : 'border-white hover:border-purple-100'}`}
+                    className={`rounded-[2.5rem] border-4 p-6 cursor-pointer transition-all shadow-lg ${
+                      selected?._id === order._id
+                        ? dark ? 'bg-gray-900 border-purple-500 shadow-purple-900' : 'bg-white border-purple-300 shadow-purple-100'
+                        : dark ? 'bg-gray-900 border-purple-900/40 hover:border-purple-700' : 'bg-white border-white hover:border-purple-100'
+                    }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-2 flex-wrap">
-                          <span className="font-black text-gray-900 font-mono text-sm">{order.orderId}</span>
+                          <span className={`font-black font-mono text-sm ${dark ? 'text-purple-200' : 'text-gray-900'}`}>{order.orderId}</span>
                           <span className={`text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest ${STATUS_COLORS[order.orderStatus] || 'bg-gray-100 text-gray-500'}`}>
                             {order.orderStatus}
                           </span>
@@ -151,16 +157,16 @@ export default function MyOrders({ setView }) {
                             {order.payment?.status}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-500 font-medium">
+                        <p className={`text-xs font-medium ${dark ? 'text-purple-300' : 'text-gray-500'}`}>
                           {order.items?.map(i => `${i.name} x${i.qty}`).join(' · ')}
                         </p>
-                        <p className="text-[10px] text-gray-400 font-medium mt-1">
+                        <p className={`text-[10px] font-medium mt-1 ${dark ? 'text-purple-500' : 'text-gray-400'}`}>
                           {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
                         </p>
                       </div>
                       <div className="text-right flex-none">
-                        <p className="font-black text-purple-700 text-lg italic">₹{order.payment?.totalAmount}</p>
-                        <p className="text-[9px] text-gray-300 font-bold mt-1">{selected?._id === order._id ? '▲ Hide' : '▼ Details'}</p>
+                        <p className={`font-black text-lg italic ${dark ? 'text-purple-400' : 'text-purple-700'}`}>₹{order.payment?.totalAmount}</p>
+                        <p className={`text-[9px] font-bold mt-1 ${dark ? 'text-purple-600' : 'text-gray-300'}`}>{selected?._id === order._id ? '▲ Hide' : '▼ Details'}</p>
                       </div>
                     </div>
 
@@ -208,16 +214,16 @@ export default function MyOrders({ setView }) {
 
                   {/* Expanded order details */}
                   {selected?._id === order._id && (
-                    <div className="bg-purple-50 rounded-[2rem] border-2 border-purple-100 p-6 mt-2 space-y-5 animate-fadeIn">
+                    <div className={`rounded-[2rem] border-2 p-6 mt-2 space-y-5 animate-fadeIn ${dark ? 'bg-purple-950/40 border-purple-800/40' : 'bg-purple-50 border-purple-100'}`}>
 
                       {/* Items */}
                       <div>
                         <p className="text-[9px] font-black text-purple-400 uppercase tracking-widest mb-3">Items Ordered</p>
                         <div className="space-y-2">
                           {order.items?.map((item, i) => (
-                            <div key={i} className="bg-white rounded-2xl p-3 flex justify-between items-center">
+                            <div key={i} className={`rounded-2xl p-3 flex justify-between items-center ${dark ? 'bg-gray-900' : 'bg-white'}`}>
                               <div>
-                                <p className="font-black text-gray-800 text-sm">{item.name}</p>
+                                <p className={`font-black text-sm ${dark ? 'text-purple-100' : 'text-gray-800'}`}>{item.name}</p>
                                 <p className="text-[9px] text-purple-400 font-bold uppercase">
                                   {item.selectedColor} · x{item.qty}
                                   {item.note ? ` · "${item.note}"` : ''}
@@ -232,22 +238,22 @@ export default function MyOrders({ setView }) {
                       {/* Payment breakdown */}
                       <div>
                         <p className="text-[9px] font-black text-purple-400 uppercase tracking-widest mb-3">Payment Summary</p>
-                        <div className="bg-white rounded-2xl p-4 space-y-2 text-sm">
-                          <div className="flex justify-between text-gray-500">
+                        <div className={`rounded-2xl p-4 space-y-2 text-sm ${dark ? 'bg-gray-900' : 'bg-white'}`}>
+                          <div className={`flex justify-between ${dark ? 'text-purple-300' : 'text-gray-500'}`}>
                             <span>Items</span><span>₹{order.payment?.subtotal || order.payment?.totalAmount}</span>
                           </div>
                           {order.payment?.deliveryCharge >= 0 && (
-                            <div className="flex justify-between text-gray-500">
+                            <div className={`flex justify-between ${dark ? 'text-purple-300' : 'text-gray-500'}`}>
                               <span>Delivery</span>
                               <span>{order.payment?.deliveryCharge === 0 ? 'FREE 🎉' : `₹${order.payment.deliveryCharge}`}</span>
                             </div>
                           )}
                           {order.giftWrap?.enabled && (
-                            <div className="flex justify-between text-gray-500">
+                            <div className={`flex justify-between ${dark ? 'text-purple-300' : 'text-gray-500'}`}>
                               <span>🎀 Gift Wrap</span><span>₹30</span>
                             </div>
                           )}
-                          <div className="flex justify-between font-black text-gray-800 border-t pt-2">
+                          <div className={`flex justify-between font-black border-t pt-2 ${dark ? 'text-purple-100 border-purple-800/40' : 'text-gray-800 border-gray-100'}`}>
                             <span>Total Paid</span><span className="text-purple-700">₹{order.payment?.totalAmount}</span>
                           </div>
                         </div>
@@ -256,7 +262,7 @@ export default function MyOrders({ setView }) {
                       {/* Shipping */}
                       <div>
                         <p className="text-[9px] font-black text-purple-400 uppercase tracking-widest mb-3">Shipping Details</p>
-                        <div className="bg-white rounded-2xl p-4 space-y-1 text-sm text-gray-600">
+                        <div className={`rounded-2xl p-4 space-y-1 text-sm ${dark ? 'bg-gray-900 text-purple-300' : 'bg-white text-gray-600'}`}>
                           <p className="font-medium">📍 {order.customer?.address}</p>
                           {order.shipping?.courier && (
                             <p className="font-bold text-blue-600">🚚 {order.shipping.courier}</p>
@@ -281,11 +287,11 @@ export default function MyOrders({ setView }) {
                       )}
 
                       {/* No cancel/refund notice */}
-                      <div className="bg-white rounded-2xl p-4 border-2 border-purple-100 text-center">
-                        <p className="text-[9px] font-black text-purple-400 uppercase tracking-widest">
+                      <div className={`rounded-2xl p-4 border-2 text-center ${dark ? 'bg-gray-900 border-purple-800/40' : 'bg-white border-purple-100'}`}>
+                        <p className={`text-[9px] font-black uppercase tracking-widest ${dark ? 'text-purple-400' : 'text-purple-400'}`}>
                           🧶 Handmade to order · No cancellations or refunds
                         </p>
-                        <p className="text-[9px] text-gray-400 font-medium mt-1">
+                        <p className={`text-[9px] font-medium mt-1 ${dark ? 'text-purple-600' : 'text-gray-400'}`}>
                           Questions? Email us at support@shimmernest.com
                         </p>
                       </div>
@@ -300,34 +306,34 @@ export default function MyOrders({ setView }) {
 
       {/* ── PROFILE TAB ────────────────────────────────────── */}
       {activeTab === 'profile' && (
-        <div className="bg-white rounded-[3rem] shadow-2xl border-4 border-white p-8 space-y-5">
-          <h2 className="text-xl font-black text-gray-800 italic">Your Details 🎀</h2>
+        <div className={`rounded-[3rem] shadow-2xl border-4 p-8 space-y-5 ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-white'}`}>
+          <h2 className={`text-xl font-black italic ${dark ? 'text-white' : 'text-gray-800'}`}>Your Details 🎀</h2>
 
           <div>
-            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">Full Name</label>
+            <label className={`text-[9px] font-black uppercase tracking-widest mb-1 block ${dark ? 'text-purple-400' : 'text-gray-400'}`}>Full Name</label>
             <input value={profileForm.name} onChange={e => setProfileForm(p => ({...p, name: e.target.value}))}
-              className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-purple-200 outline-none text-sm font-medium" />
+              className={`w-full p-4 rounded-2xl border-2 focus:border-purple-400 outline-none text-sm font-medium ${dark ? 'bg-gray-800 border-gray-700 text-purple-100' : 'bg-gray-50 border-transparent text-gray-800'}`} />
           </div>
 
           <div>
-            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">Email</label>
+            <label className={`text-[9px] font-black uppercase tracking-widest mb-1 block ${dark ? 'text-purple-400' : 'text-gray-400'}`}>Email</label>
             <input value={customer?.email} disabled
-              className="w-full p-4 bg-gray-100 rounded-2xl border-2 border-transparent outline-none text-sm font-medium text-gray-400 cursor-not-allowed" />
-            <p className="text-[9px] text-gray-300 font-medium mt-1">Email cannot be changed</p>
+              className={`w-full p-4 rounded-2xl border-2 outline-none text-sm font-medium cursor-not-allowed ${dark ? 'bg-gray-800 border-gray-700 text-purple-600' : 'bg-gray-100 border-transparent text-gray-400'}`} />
+            <p className={`text-[9px] font-medium mt-1 ${dark ? 'text-purple-700' : 'text-gray-300'}`}>Email cannot be changed</p>
           </div>
 
           <div>
-            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">Phone</label>
+            <label className={`text-[9px] font-black uppercase tracking-widest mb-1 block ${dark ? 'text-purple-400' : 'text-gray-400'}`}>Phone</label>
             <input value={profileForm.phone} onChange={e => setProfileForm(p => ({...p, phone: e.target.value}))}
               maxLength={10} inputMode="numeric"
-              className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-purple-200 outline-none text-sm font-medium" />
+              className={`w-full p-4 rounded-2xl border-2 focus:border-purple-400 outline-none text-sm font-medium ${dark ? 'bg-gray-800 border-gray-700 text-purple-100' : 'bg-gray-50 border-transparent text-gray-800'}`} />
           </div>
 
           <div>
-            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">Default Delivery Address</label>
+            <label className={`text-[9px] font-black uppercase tracking-widest mb-1 block ${dark ? 'text-purple-400' : 'text-gray-400'}`}>Default Delivery Address</label>
             <textarea value={profileForm.address} onChange={e => setProfileForm(p => ({...p, address: e.target.value}))}
               rows={3} placeholder="Your full address + pincode"
-              className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-purple-200 outline-none text-sm font-medium resize-none" />
+              className={`w-full p-4 rounded-2xl border-2 focus:border-purple-400 outline-none text-sm font-medium resize-none ${dark ? 'bg-gray-800 border-gray-700 text-purple-100 placeholder-purple-700' : 'bg-gray-50 border-transparent text-gray-800'}`} />
           </div>
 
           {saveMsg && (

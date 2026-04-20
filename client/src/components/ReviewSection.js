@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 export default function ReviewSection({ product }) {
+  const { dark } = useTheme();
   const [name, setName] = useState('');
   const [rating, setRating] = useState(0);
   const [hovered, setHovered] = useState(0);
@@ -30,11 +32,11 @@ export default function ReviewSection({ product }) {
 
       {/* Header */}
       <div className="flex items-center gap-4">
-        <h3 className="text-3xl font-black text-gray-800 italic tracking-tighter">
+        <h3 className={`text-3xl font-black italic tracking-tighter ${dark ? 'text-white' : 'text-gray-800'}`}>
           Customer Reviews
         </h3>
         {avgRating && (
-          <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full">
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${dark ? 'bg-purple-900/50' : 'bg-purple-50'}`}>
             <span className="text-yellow-400 text-sm">{'★'.repeat(Math.round(avgRating))}{'☆'.repeat(5 - Math.round(avgRating))}</span>
             <span className="text-[11px] font-black text-purple-500 uppercase tracking-widest">
               {avgRating} · {reviews.length} reviews
@@ -53,7 +55,7 @@ export default function ReviewSection({ product }) {
         {reviews.map((r, i) => (
           <div
             key={i}
-            className="bg-white rounded-[2.5rem] p-6 shadow-md border-2 border-purple-50 space-y-2"
+            className={`rounded-[2.5rem] p-6 shadow-md border-2 space-y-2 ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-purple-50'}`}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -61,8 +63,8 @@ export default function ReviewSection({ product }) {
                   {r.name.charAt(0)}
                 </div>
                 <div>
-                  <p className="font-black text-gray-700 text-sm">{r.name}</p>
-                  <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest">{r.date}</p>
+                  <p className={`font-black text-sm ${dark ? 'text-purple-100' : 'text-gray-700'}`}>{r.name}</p>
+                  <p className={`text-[9px] font-bold uppercase tracking-widest ${dark ? 'text-purple-500' : 'text-gray-300'}`}>{r.date}</p>
                 </div>
               </div>
               <div className="flex">
@@ -71,7 +73,7 @@ export default function ReviewSection({ product }) {
                 ))}
               </div>
             </div>
-            <p className="text-gray-500 text-sm font-medium leading-relaxed pl-12">
+            <p className={`text-sm font-medium leading-relaxed pl-12 ${dark ? 'text-purple-300' : 'text-gray-500'}`}>
               {r.comment}
             </p>
           </div>
@@ -79,14 +81,14 @@ export default function ReviewSection({ product }) {
       </div>
 
       {/* Write a Review */}
-      <div className="bg-white rounded-[3rem] p-8 shadow-xl border-4 border-purple-50 space-y-6">
-        <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">
+      <div className={`rounded-[3rem] p-8 shadow-xl border-4 space-y-6 ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-purple-50'}`}>
+        <p className={`text-[11px] font-black uppercase tracking-widest ${dark ? 'text-purple-400' : 'text-gray-400'}`}>
           Write a Review ✍️
         </p>
 
         {/* Star Rating Picker */}
         <div className="space-y-2">
-          <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Your Rating</p>
+          <p className={`text-[10px] font-black uppercase tracking-widest ${dark ? 'text-purple-500' : 'text-gray-300'}`}>Your Rating</p>
           <div className="flex gap-1">
             {[1,2,3,4,5].map((s) => (
               <button
@@ -109,7 +111,7 @@ export default function ReviewSection({ product }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Your name 🌸"
-          className="w-full p-4 rounded-[1.5rem] bg-purple-50/50 border-2 border-transparent focus:border-purple-200 outline-none text-sm font-medium transition-all"
+          className={`w-full p-4 rounded-[1.5rem] border-2 focus:border-purple-300 outline-none text-sm font-medium transition-all ${dark ? 'bg-gray-800 border-gray-700 text-purple-100 placeholder-purple-700' : 'bg-purple-50/50 border-transparent'}`}
         />
 
         {/* Comment */}
@@ -118,7 +120,7 @@ export default function ReviewSection({ product }) {
           onChange={(e) => setComment(e.target.value)}
           placeholder="Share your experience with this product... 💜"
           rows={3}
-          className="w-full p-5 rounded-[2rem] bg-purple-50/50 border-2 border-transparent focus:border-purple-200 outline-none text-sm font-medium italic resize-none transition-all"
+          className={`w-full p-5 rounded-[2rem] border-2 focus:border-purple-300 outline-none text-sm font-medium italic resize-none transition-all ${dark ? 'bg-gray-800 border-gray-700 text-purple-100 placeholder-purple-700' : 'bg-purple-50/50 border-transparent'}`}
         />
 
         <button

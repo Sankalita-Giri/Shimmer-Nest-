@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import emailjs from "@emailjs/browser";
+import { useTheme } from "../context/ThemeContext";
 
 // ── Pricing constants (single source of truth) ────────────
 const FREE_SHIPPING_MIN = 500;
@@ -9,6 +10,7 @@ const GIFT_WRAP_CHARGE  = 30;
 const FREE_GIFT_MIN     = 300;
 
 export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
+  const { dark } = useTheme();
   // ── Step: "summary" → "form" → "payment" ─────────────────
   const [step, setStep]           = useState("summary");
   const [loading, setLoading]     = useState(false);
@@ -199,19 +201,19 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
       {/* ── STEP 1: ORDER SUMMARY + GIFT WRAP ───────────────── */}
       {step === "summary" && (
         <div className="space-y-6 animate-fadeIn">
-          <h3 className="text-3xl font-black text-gray-800 italic tracking-tighter">
+          <h3 className={`text-3xl font-black italic tracking-tighter ${dark ? 'text-white' : 'text-gray-800'}`}>
             Order Summary 🛍️
           </h3>
 
           {/* Items list */}
-          <div className="bg-white rounded-[3rem] border-4 border-white shadow-xl p-6 space-y-3">
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">Your Items</p>
+          <div className={`rounded-[3rem] border-4 shadow-xl p-6 space-y-3 ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-white'}`}>
+            <p className={`text-[9px] font-black uppercase tracking-widest mb-4 ${dark ? 'text-purple-400' : 'text-gray-400'}`}>Your Items</p>
             {cart.map((item, i) => (
-              <div key={i} className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-2xl">
+              <div key={i} className={`flex items-center justify-between gap-3 p-3 rounded-2xl ${dark ? 'bg-gray-800' : 'bg-gray-50'}`}>
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center text-base flex-none">🧶</div>
                   <div className="min-w-0">
-                    <p className="font-black text-gray-800 text-sm truncate">{item.name}</p>
+                    <p className={`font-black text-sm truncate ${dark ? 'text-purple-100' : 'text-gray-800'}`}>{item.name}</p>
                     <p className="text-[9px] font-bold text-purple-400 uppercase tracking-widest">
                       {item.selectedColor || "Original"} · x{item.qty}
                       {item.note ? ` · "${item.note}"` : ""}
@@ -225,14 +227,14 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
 
           {/* Free shipping progress */}
           {subtotal < FREE_SHIPPING_MIN && (
-            <div className="bg-white rounded-[2rem] border-4 border-white shadow-lg p-5">
+            <div className={`rounded-[2rem] border-4 shadow-lg p-5 ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-white'}`}>
               <div className="flex justify-between items-center mb-2">
                 <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest">
                   {amountToFreeShipping > 0
                     ? `Add ₹${amountToFreeShipping} more for FREE shipping! 🚚`
                     : "FREE shipping unlocked! 🎉"}
                 </p>
-                <p className="text-[9px] font-black text-gray-400">₹{subtotal} / ₹{FREE_SHIPPING_MIN}</p>
+                <p className={`text-[9px] font-black ${dark ? 'text-purple-400' : 'text-gray-400'}`}>₹{subtotal} / ₹{FREE_SHIPPING_MIN}</p>
               </div>
               <div className="w-full h-2 bg-purple-50 rounded-full overflow-hidden">
                 <div
@@ -253,13 +255,13 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
           )}
 
           {/* Gift wrap toggle */}
-          <div className={`bg-white rounded-[2.5rem] border-4 p-6 shadow-xl transition-all ${giftWrap ? "border-pink-200" : "border-white"}`}>
+          <div className={`rounded-[2.5rem] border-4 p-6 shadow-xl transition-all ${giftWrap ? (dark ? 'border-pink-700 bg-gray-900' : 'border-pink-200 bg-white') : (dark ? 'border-purple-900/40 bg-gray-900' : 'border-white bg-white')}`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">🎀</span>
                 <div>
-                  <p className="font-black text-gray-800 text-sm">Add Gift Wrapping</p>
-                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                  <p className={`font-black text-sm ${dark ? 'text-purple-100' : 'text-gray-800'}`}>Add Gift Wrapping</p>
+                  <p className={`text-[9px] font-bold uppercase tracking-widest ${dark ? 'text-purple-400' : 'text-gray-400'}`}>
                     Beautiful wrap + ribbon · +₹{GIFT_WRAP_CHARGE}
                   </p>
                 </div>
@@ -344,18 +346,18 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
         <div className="space-y-6 animate-fadeIn">
 
           {/* Mini summary reminder */}
-          <div className="bg-purple-50 rounded-2xl p-4 flex justify-between items-center border border-purple-100">
+          <div className={`rounded-2xl p-4 flex justify-between items-center border ${dark ? 'bg-purple-950/50 border-purple-800/40' : 'bg-purple-50 border-purple-100'}`}>
             <div>
               <p className="text-[9px] font-black text-purple-400 uppercase tracking-widest">Order Total</p>
-              <p className="text-2xl font-black text-purple-700 italic">₹{grandTotal}</p>
+              <p className={`text-2xl font-black italic ${dark ? 'text-purple-300' : 'text-purple-700'}`}>₹{grandTotal}</p>
             </div>
             <button onClick={() => setStep("summary")} className="text-[9px] font-black text-purple-400 uppercase tracking-widest hover:text-purple-600">
               ← Edit Order
             </button>
           </div>
 
-          <div className="bg-white p-8 rounded-[3rem] shadow-2xl border-4 border-white space-y-5">
-            <h3 className="text-2xl font-black text-gray-800 italic">Delivery Info 🎀</h3>
+          <div className={`p-8 rounded-[3rem] shadow-2xl border-4 space-y-5 ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-white'}`}>
+            <h3 className={`text-2xl font-black italic ${dark ? 'text-white' : 'text-gray-800'}`}>Delivery Info 🎀</h3>
 
             {/* Honeypot */}
             <input type="text" name="securityCode" value={formData.securityCode} onChange={handleChange} className="hidden" tabIndex="-1" autoComplete="off" />
@@ -363,29 +365,49 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
             <div className="grid gap-3">
               <div>
                 <input name="name" placeholder="Your Full Name" value={formData.name} onChange={handleChange}
-                  className={`w-full p-4 bg-gray-50 rounded-2xl border-2 outline-none text-sm font-medium transition-colors ${errors.name ? "border-red-200 bg-red-50" : "border-transparent focus:border-purple-200"}`} />
+                  className={`w-full p-4 rounded-2xl border-2 outline-none text-sm font-medium transition-colors ${
+                    errors.name
+                      ? 'border-red-300 bg-red-950/30 text-red-300'
+                      : dark ? 'bg-gray-800 border-gray-700 text-purple-100 placeholder-purple-700 focus:border-purple-500' : 'bg-gray-50 border-transparent text-gray-800 focus:border-purple-200'
+                  }`} />
                 {errors.name && <p className="text-red-400 text-[10px] font-bold mt-1 px-2">{errors.name}</p>}
               </div>
               <div>
                 <input name="email" type="email" placeholder="Email (for order receipt)" value={formData.email} onChange={handleChange}
-                  className={`w-full p-4 bg-gray-50 rounded-2xl border-2 outline-none text-sm font-medium transition-colors ${errors.email ? "border-red-200 bg-red-50" : "border-transparent focus:border-purple-200"}`} />
+                  className={`w-full p-4 rounded-2xl border-2 outline-none text-sm font-medium transition-colors ${
+                    errors.email
+                      ? 'border-red-300 bg-red-950/30 text-red-300'
+                      : dark ? 'bg-gray-800 border-gray-700 text-purple-100 placeholder-purple-700 focus:border-purple-500' : 'bg-gray-50 border-transparent text-gray-800 focus:border-purple-200'
+                  }`} />
                 {errors.email && <p className="text-red-400 text-[10px] font-bold mt-1 px-2">{errors.email}</p>}
               </div>
               <div>
                 <input name="phone" placeholder="WhatsApp Number (10 digits)" value={formData.phone} onChange={handleChange} maxLength={10} inputMode="numeric"
-                  className={`w-full p-4 bg-gray-50 rounded-2xl border-2 outline-none text-sm font-medium transition-colors ${errors.phone ? "border-red-200 bg-red-50" : "border-transparent focus:border-purple-200"}`} />
+                  className={`w-full p-4 rounded-2xl border-2 outline-none text-sm font-medium transition-colors ${
+                    errors.phone
+                      ? 'border-red-300 bg-red-950/30 text-red-300'
+                      : dark ? 'bg-gray-800 border-gray-700 text-purple-100 placeholder-purple-700 focus:border-purple-500' : 'bg-gray-50 border-transparent text-gray-800 focus:border-purple-200'
+                  }`} />
                 {errors.phone && <p className="text-red-400 text-[10px] font-bold mt-1 px-2">{errors.phone}</p>}
               </div>
               <div>
                 <textarea name="address" placeholder="Full Delivery Address + Pincode" rows="3" value={formData.address} onChange={handleChange}
-                  className={`w-full p-4 bg-gray-50 rounded-2xl border-2 outline-none text-sm font-medium resize-none transition-colors ${errors.address ? "border-red-200 bg-red-50" : "border-transparent focus:border-purple-200"}`} />
+                  className={`w-full p-4 rounded-2xl border-2 outline-none text-sm font-medium resize-none transition-colors ${
+                    errors.address
+                      ? 'border-red-300 bg-red-950/30 text-red-300'
+                      : dark ? 'bg-gray-800 border-gray-700 text-purple-100 placeholder-purple-700 focus:border-purple-500' : 'bg-gray-50 border-transparent text-gray-800 focus:border-purple-200'
+                  }`} />
                 {errors.address && <p className="text-red-400 text-[10px] font-bold mt-1 px-2">{errors.address}</p>}
               </div>
             </div>
 
-            <div className={`flex items-start space-x-3 p-4 rounded-2xl border transition-all ${errors.agreed ? "bg-red-50 border-red-100" : "bg-purple-50 border-purple-50"}`}>
+            <div className={`flex items-start space-x-3 p-4 rounded-2xl border transition-all ${
+              errors.agreed
+                ? 'bg-red-950/30 border-red-700'
+                : dark ? 'bg-purple-950/40 border-purple-800/40' : 'bg-purple-50 border-purple-50'
+            }`}>
               <input type="checkbox" id="agreed" checked={agreed} onChange={() => setAgreed(!agreed)} className="mt-1 w-5 h-5 accent-purple-600" />
-              <label htmlFor="agreed" className="text-[9px] font-bold text-gray-500 uppercase leading-relaxed">
+              <label htmlFor="agreed" className={`text-[9px] font-bold uppercase leading-relaxed ${dark ? 'text-purple-300' : 'text-gray-500'}`}>
                 I understand handmade items take 5–7 working days and all sales are final (non-refundable). 💜
               </label>
             </div>
@@ -404,8 +426,8 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
 
       {/* ── STEP 3: PAYMENT ──────────────────────────────────── */}
       {step === "payment" && (
-        <div className="bg-white p-8 rounded-[4rem] shadow-2xl border-4 border-white text-center space-y-8 animate-fadeIn">
-          <h3 className="text-2xl font-black text-gray-800 italic">Complete Payment ✨</h3>
+        <div className={`p-8 rounded-[4rem] shadow-2xl border-4 text-center space-y-8 animate-fadeIn ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-white'}`}>
+          <h3 className={`text-2xl font-black italic ${dark ? 'text-white' : 'text-gray-800'}`}>Complete Payment ✨</h3>
 
           {/* Amount display with breakdown */}
           <div className="bg-gray-900 text-white py-10 px-8 rounded-[3.5rem] relative overflow-hidden">
@@ -437,10 +459,10 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
 
           {/* UPI options */}
           <div className="space-y-4">
-            <div className="bg-purple-50 p-6 rounded-3xl border-2 border-dashed border-purple-100 flex items-center justify-between">
+            <div className={`p-6 rounded-3xl border-2 border-dashed flex items-center justify-between ${dark ? 'bg-purple-950/40 border-purple-800/40' : 'bg-purple-50 border-purple-100'}`}>
               <div className="text-left">
                 <p className="text-[8px] font-black text-purple-300 uppercase tracking-widest">UPI ID</p>
-                <p className="text-sm font-mono font-black text-purple-900">{upiId}</p>
+                <p className={`text-sm font-mono font-black ${dark ? 'text-purple-200' : 'text-purple-900'}`}>{upiId}</p>
               </div>
               <button onClick={copyUpi} className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase transition-all active:scale-95 ${upiCopied ? "bg-green-500" : "bg-purple-600"} text-white`}>
                 {upiCopied ? "Copied! ✓" : "Copy ID"}
@@ -453,9 +475,9 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
                 { name: "PhonePe", emoji: "🟣", color: "border-purple-100 hover:border-purple-300", url: `phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${grandTotal}&cu=INR` },
                 { name: "Paytm",   emoji: "🔵", color: "border-blue-100 hover:border-blue-300",     url: `paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${grandTotal}&cu=INR` },
               ].map((app) => (
-                <a key={app.name} href={app.url} className={`p-4 bg-white rounded-2xl border-2 ${app.color} hover:shadow-lg transition-all flex flex-col items-center gap-1 active:scale-95`}>
+                <a key={app.name} href={app.url} className={`p-4 rounded-2xl border-2 ${app.color} hover:shadow-lg transition-all flex flex-col items-center gap-1 active:scale-95 ${dark ? 'bg-gray-800' : 'bg-white'}`}>
                   <span className="text-xl">{app.emoji}</span>
-                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-wide">{app.name}</span>
+                  <span className={`text-[9px] font-black uppercase tracking-wide ${dark ? 'text-purple-300' : 'text-gray-500'}`}>{app.name}</span>
                 </a>
               ))}
             </div>
@@ -466,12 +488,20 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
           <div className="space-y-4 text-left">
             <div>
               <input name="payerName" placeholder="Bank Account Holder Name (as shown in UPI app)" value={formData.payerName} onChange={handleChange}
-                className={`w-full p-4 bg-gray-50 rounded-2xl border-2 outline-none text-sm font-bold transition-colors ${errors.payerName ? "border-red-200 bg-red-50" : "border-transparent focus:border-purple-100"}`} />
+                className={`w-full p-4 rounded-2xl border-2 outline-none text-sm font-bold transition-colors ${
+                  errors.payerName
+                    ? 'border-red-300 bg-red-950/30 text-red-300'
+                    : dark ? 'bg-gray-800 border-gray-700 text-purple-100 placeholder-purple-700 focus:border-purple-500' : 'bg-gray-50 border-transparent focus:border-purple-100'
+                }`} />
               {errors.payerName && <p className="text-red-400 text-[10px] font-bold mt-1 px-2">{errors.payerName}</p>}
             </div>
             <div>
               <input name="transactionId" placeholder="12-Digit UTR / Transaction ID" maxLength="12" inputMode="numeric" value={formData.transactionId} onChange={handleChange}
-                className={`w-full p-5 bg-gray-50 rounded-2xl border-4 text-center font-mono text-2xl tracking-widest outline-none transition-all ${errors.transactionId ? "border-red-200 bg-red-50" : "border-purple-50 focus:border-purple-600"}`} />
+                className={`w-full p-5 rounded-2xl border-4 text-center font-mono text-2xl tracking-widest outline-none transition-all ${
+                  errors.transactionId
+                    ? 'border-red-300 bg-red-950/30 text-red-300'
+                    : dark ? 'bg-gray-800 border-gray-700 text-purple-100 focus:border-purple-500' : 'bg-gray-50 border-purple-50 focus:border-purple-600'
+                }`} />
               {errors.transactionId && <p className="text-red-400 text-[10px] font-bold text-center mt-1">{errors.transactionId}</p>}
               <div className="flex justify-between items-center mt-2 px-1">
                 <p className="text-[9px] text-gray-300 font-medium">Find UTR: UPI app → Transaction History → Details</p>
