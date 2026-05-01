@@ -4,6 +4,9 @@ const cors            = require('cors');
 const orderRoutes     = require('./routes/orderRoutes');
 const customerRoutes  = require('./routes/customerRoutes');
 const cartRoutes      = require('./routes/cartRoutes');
+const productRoutes   = require('./routes/productRoutes');
+const uploadRoutes    = require('./routes/uploadRoutes');
+const siteRoutes      = require('./routes/siteRoutes');
 require('dotenv').config();
 
 const app = express();
@@ -16,6 +19,9 @@ app.use(express.json());
 app.use('/api/orders',    orderRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/cart',      cartRoutes);
+app.use('/api/products',  productRoutes);
+app.use('/api/upload',    uploadRoutes);
+app.use('/api/site',      siteRoutes);
 
 // 3. Health check
 app.get('/', (req, res) => {

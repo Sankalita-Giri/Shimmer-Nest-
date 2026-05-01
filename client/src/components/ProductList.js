@@ -1,14 +1,15 @@
 import React from 'react';
-import { products, subCategories } from "../data";
+import { subCategories } from "../data";
 import { useTheme } from '../context/ThemeContext';
+import SkeletonCard from './SkeletonCard';
 
-export default function ProductList({ category, subCat, setSelectedProduct, setView, goBack }) {
+export default function ProductList({ category, subCat, setSelectedProduct, setView, goBack, products, loading }) {
   const { dark } = useTheme();
 
-  const items = products.filter(p =>
+  const items = products ? products.filter(p =>
     p.category?.toLowerCase() === category?.toLowerCase() &&
     p.subCat?.toLowerCase() === subCat?.toLowerCase()
-  );
+  ) : [];
 
   const subCatData = subCategories[category]?.find(s => s.id === subCat);
   const subCatName = subCatData ? subCatData.name : subCat;
@@ -42,7 +43,11 @@ export default function ProductList({ category, subCat, setSelectedProduct, setV
       </div>
 
       {/* Product Grid */}
-      {items.length > 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
+          {[1,2,3,4,5,6].map(i => <SkeletonCard key={i} dark={dark} />)}
+        </div>
+      ) : items.length > 0 ? (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
           {items.map((item) => {
             const outOfStock = item.stock !== undefined && item.stock <= 0;
@@ -53,7 +58,6 @@ export default function ProductList({ category, subCat, setSelectedProduct, setV
                 onClick={() => {
                   if (outOfStock) return;
                   setSelectedProduct(item);
-                  setView("product-detail");
                   window.scrollTo(0, 0);
                 }}
                 className={`group ${outOfStock ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
@@ -73,8 +77,8 @@ export default function ProductList({ category, subCat, setSelectedProduct, setV
 
                     {/* Out of Stock Badge */}
                     {outOfStock && (
-                      <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-sm rounded-[2.2rem]">
-                        <span className="bg-gray-800 text-white text-[9px] font-black px-4 py-2 rounded-full uppercase tracking-widest">
+                      <div className="absolute inset-0 z-20 flex items-center justify-center bg-gray-950/40 backdrop-blur-[2px] rounded-[2.2rem]">
+                        <span className="bg-white text-gray-900 text-[10px] font-black px-5 py-2.5 rounded-full uppercase tracking-[0.2em] shadow-2xl">
                           Sold Out
                         </span>
                       </div>
@@ -83,7 +87,7 @@ export default function ProductList({ category, subCat, setSelectedProduct, setV
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                      className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ${outOfStock ? 'grayscale opacity-60' : ''}`}
                       onError={(e) => { e.target.src = 'https://placehold.co/400x400?text=ShimmerNest'; }}
                     />
                     <div className="absolute inset-0 bg-purple-900/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-[2.2rem]" />

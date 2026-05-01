@@ -3,23 +3,37 @@ import ReviewSection from './ReviewSection';
 import { useTheme } from '../context/ThemeContext';
 
 export default function ProductDetail({ product, addToCart, goBack, navigateToCart, navigateToCheckout }) {
-  const [mainImg, setMainImg] = useState(product.image);
   const [qty, setQty] = useState(1);
-  const [color, setColor] = useState("Original");
   const [note, setNote] = useState("");
   const [isAdded, setIsAdded] = useState(false);
   const { dark } = useTheme();
 
+  // Handle variants (different prices/images per selection)
+  const [selectedVariant, setSelectedVariant] = useState(product.variants ? product.variants[0] : null);
+  const [color, setColor] = useState("Original");
+  const [mainImg, setMainImg] = useState(product.image);
+
+  const outOfStock = product.stock !== undefined && product.stock <= 0;
   const allImages = product.images || [product.image];
   const colorOptions = product.colors?.length > 0 ? product.colors : ["Original", "Pastel", "Midnight"];
 
+  const currentPrice = selectedVariant ? selectedVariant.price : product.price;
+  const currentColor = selectedVariant ? selectedVariant.name : color;
+
+  const handleVariantSelect = (v) => {
+    setSelectedVariant(v);
+    if (v.imageIndex !== undefined && allImages[v.imageIndex]) {
+      setMainImg(allImages[v.imageIndex]);
+    }
+  };
+
   const handleAddToCart = () => {
-    addToCart(product, qty, color, note);
+    addToCart(product, qty, currentColor, note, currentPrice);
     setIsAdded(true);
   };
 
   const handleBuyNow = () => {
-    addToCart(product, qty, color, note);
+    addToCart(product, qty, currentColor, note, currentPrice);
     if (navigateToCheckout) navigateToCheckout();
   };
 
@@ -38,14 +52,19 @@ export default function ProductDetail({ product, addToCart, goBack, navigateToCa
         <div className="space-y-4">
           {/* Main image */}
           <div className="aspect-square rounded-[3rem] overflow-hidden bg-gray-50 border-4 border-purple-50 group relative">
+            {outOfStock && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-950/40 backdrop-blur-md">
+                <span className="bg-white text-gray-900 text-xs font-black px-8 py-3 rounded-full uppercase tracking-widest shadow-2xl">Sold Out</span>
+              </div>
+            )}
             <img
               src={mainImg}
               alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${outOfStock ? 'grayscale opacity-50' : ''}`}
               onError={(e) => { e.target.src = 'https://placehold.co/600x600?text=ShimmerNest'; }}
             />
             {/* Image count badge */}
-            {allImages.length > 1 && (
+            {!outOfStock && allImages.length > 1 && (
               <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm text-white text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest">
                 {allImages.indexOf(mainImg) + 1} / {allImages.length}
               </div>
@@ -54,7 +73,7 @@ export default function ProductDetail({ product, addToCart, goBack, navigateToCa
 
           {/* Thumbnail grid — scrollable, handles up to 50 images */}
           {allImages.length > 1 && (
-            <div>
+            <div className={outOfStock ? 'grayscale opacity-50 pointer-events-none' : ''}>
               {/* For many images (wool) — show as grid */}
               {allImages.length > 8 ? (
                 <div className={`max-h-48 overflow-y-auto rounded-2xl border p-2 ${dark ? 'bg-gray-800 border-purple-800/40' : 'bg-gray-50 border-purple-50'}`}>
@@ -104,15 +123,20 @@ export default function ProductDetail({ product, addToCart, goBack, navigateToCa
         {/* RIGHT: DETAILS */}
         <div className="flex flex-col justify-center space-y-8">
           <div>
-            {product.tag && (
-              <span className={`text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest ${dark ? 'bg-purple-900/60 text-purple-300' : 'bg-purple-100 text-purple-600'}`}>
-                {product.tag}
-              </span>
-            )}
+            <div className="flex items-center gap-3">
+                {product.tag && (
+                <span className={`text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest ${dark ? 'bg-purple-900/60 text-purple-300' : 'bg-purple-100 text-purple-600'}`}>
+                    {product.tag}
+                </span>
+                )}
+                {outOfStock && (
+                    <span className="bg-red-500 text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest animate-pulse">Out of Stock</span>
+                )}
+            </div>
             <h2 className={`text-4xl md:text-5xl font-black italic mt-4 tracking-tighter leading-tight ${dark ? 'text-white' : 'text-gray-800'}`}>
               {product.name}
             </h2>
-            <p className="text-6xl font-black text-purple-600 tracking-tighter mt-4">₹{product.price}</p>
+            <p className="text-6xl font-black text-purple-600 tracking-tighter mt-4">₹{currentPrice}</p>
 
             {/* Rating summary */}
             {product.rating && (
@@ -136,27 +160,49 @@ export default function ProductDetail({ product, addToCart, goBack, navigateToCa
           </div>
 
           {/* Color Selector */}
-          <div className="space-y-3">
+          <div className={`space-y-3 ${outOfStock ? 'opacity-40 pointer-events-none' : ''}`}>
             <p className={`text-[11px] font-black uppercase tracking-widest ${dark ? 'text-purple-400' : 'text-gray-400'}`}>
-              Select Shade — <span className="text-purple-500">{color}</span>
+              Select Shade — <span className="text-purple-500">{currentColor}</span>
             </p>
-            <div className="flex flex-wrap gap-2">
-              {colorOptions.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => setColor(c)}
-                  className={`px-5 py-2 rounded-xl border-2 font-black text-[10px] uppercase transition-all ${
-                    color === c ? 'bg-purple-600 border-purple-600 text-white' : dark ? 'bg-gray-800 border-gray-700 text-purple-300 hover:border-purple-500' : 'bg-white border-gray-100 text-gray-400 hover:border-purple-200'
-                  }`}
-                >
-                  {c}
-                </button>
-              ))}
+            <div className="flex flex-wrap gap-3">
+              {product.variants ? (
+                product.variants.map((v) => (
+                  <button
+                    key={v.name}
+                    onClick={() => handleVariantSelect(v)}
+                    className={`px-6 py-3.5 rounded-[1.5rem] border-2 font-black text-[11px] uppercase tracking-wider transition-all duration-300 shadow-sm ${
+                      selectedVariant?.name === v.name 
+                        ? 'bg-purple-600 border-purple-600 text-white shadow-purple-200 scale-105' 
+                        : dark 
+                          ? 'bg-gray-800 border-gray-700 text-purple-300 hover:border-purple-500' 
+                          : 'bg-white border-purple-50 text-gray-400 hover:border-purple-200 hover:text-purple-600'
+                    }`}
+                  >
+                    {v.name}
+                  </button>
+                ))
+              ) : (
+                colorOptions.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setColor(c)}
+                    className={`px-6 py-3.5 rounded-[1.5rem] border-2 font-black text-[11px] uppercase tracking-wider transition-all duration-300 shadow-sm ${
+                      color === c 
+                        ? 'bg-purple-600 border-purple-600 text-white shadow-purple-200 scale-105' 
+                        : dark 
+                          ? 'bg-gray-800 border-gray-700 text-purple-300 hover:border-purple-500' 
+                          : 'bg-white border-purple-50 text-gray-400 hover:border-purple-200 hover:text-purple-600'
+                    }`}
+                  >
+                    {c}
+                  </button>
+                ))
+              )}
             </div>
           </div>
 
           {/* Custom Note */}
-          <div className="space-y-3">
+          <div className={`space-y-3 ${outOfStock ? 'opacity-40 pointer-events-none' : ''}`}>
             <p className={`text-[11px] font-black uppercase tracking-widest flex justify-between ${dark ? 'text-purple-400' : 'text-gray-400'}`}>
               <span>Custom Message 🎀</span>
               <span className="normal-case font-medium opacity-60 text-[9px]">Hand-made requests</span>
@@ -173,7 +219,7 @@ export default function ProductDetail({ product, addToCart, goBack, navigateToCa
           {/* Quantity & Actions */}
           <div className="space-y-4">
             <div className="flex gap-4 items-stretch">
-              <div className={`flex items-center space-x-4 px-5 rounded-3xl border-2 shadow-sm ${dark ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-white'}`}>
+              <div className={`flex items-center space-x-4 px-5 rounded-3xl border-2 shadow-sm ${dark ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-white'} ${outOfStock ? 'opacity-40 pointer-events-none' : ''}`}>
                 <button onClick={() => setQty(Math.max(1, qty - 1))} className="font-black text-xl text-purple-400 w-8">−</button>
                 <span className={`font-black text-xl w-6 text-center ${dark ? 'text-purple-100' : 'text-gray-800'}`}>{qty}</span>
                 <button onClick={() => setQty(qty + 1)} className="font-black text-xl text-purple-400 w-8">+</button>
@@ -182,9 +228,10 @@ export default function ProductDetail({ product, addToCart, goBack, navigateToCa
               {!isAdded ? (
                 <button
                   onClick={handleAddToCart}
-                  className="flex-grow py-5 bg-white border-4 border-purple-600 text-purple-600 rounded-[2rem] font-black uppercase tracking-widest text-[11px] hover:bg-purple-50 transition-all active:scale-95"
+                  disabled={outOfStock}
+                  className={`flex-grow py-5 rounded-[2rem] font-black uppercase tracking-widest text-[11px] transition-all active:scale-95 ${outOfStock ? 'bg-gray-100 text-gray-400 border-4 border-gray-200 cursor-not-allowed' : 'bg-white border-4 border-purple-600 text-purple-600 hover:bg-purple-50'}`}
                 >
-                  Add to Basket 🧺
+                  {outOfStock ? 'Out of Stock 😢' : 'Add to Basket 🧺'}
                 </button>
               ) : (
                 <button
@@ -198,9 +245,10 @@ export default function ProductDetail({ product, addToCart, goBack, navigateToCa
 
             <button
               onClick={handleBuyNow}
-              className="w-full py-6 bg-purple-600 text-white rounded-[2.5rem] font-black uppercase tracking-[0.3em] text-[11px] shadow-2xl hover:bg-purple-700 active:scale-95 transition-all shadow-purple-200"
+              disabled={outOfStock}
+              className={`w-full py-6 rounded-[2.5rem] font-black uppercase tracking-[0.3em] text-[11px] transition-all shadow-2xl ${outOfStock ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none' : 'bg-purple-600 text-white shadow-purple-200 hover:bg-purple-700 active:scale-95'}`}
             >
-              Buy It Now ✨
+              {outOfStock ? 'Temporarily Unavailable' : 'Buy It Now ✨'}
             </button>
           </div>
 

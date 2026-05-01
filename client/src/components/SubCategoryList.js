@@ -1,10 +1,13 @@
 import React from 'react';
-import { subCategories } from '../data';
+import { subCategories as defaultSubCats } from '../data';
 import { useTheme } from '../context/ThemeContext';
+import { useSiteConfig } from '../context/SiteConfigContext';
 
 export default function SubCategoryList({ activeCat, setSubCat, setView, goBack }) {
   const { dark } = useTheme();
-  const currentSubCats = subCategories[activeCat] || [];
+  const { siteConfig } = useSiteConfig();
+
+  const currentSubCats = siteConfig?.subCategories?.[activeCat] || defaultSubCats[activeCat] || [];
 
   const singular = activeCat
     ? activeCat.charAt(0).toUpperCase() + activeCat.slice(1, -1)
@@ -13,10 +16,9 @@ export default function SubCategoryList({ activeCat, setSubCat, setView, goBack 
   // Category display names
   const catNames = {
     keychains: "Crochet Keychains",
-    plushies:  "Crochet Mini Plushies",
-    totes:     "Crochet Tote Bags",
-    hair:      "Hair Accessories",
-    bouquets:  "Crochet Bouquets",
+    plushies: "Crochet Plushies",
+    hair: "Hair Accessories",
+    bouquets: "Crochet Bouquets",
   };
   const catName = catNames[activeCat] || activeCat;
 
@@ -66,7 +68,6 @@ export default function SubCategoryList({ activeCat, setSubCat, setView, goBack 
               key={sub.id}
               onClick={() => {
                 setSubCat(sub.id);
-                setView("productList");
                 window.scrollTo(0, 0);
               }}
               className="group cursor-pointer text-center"
