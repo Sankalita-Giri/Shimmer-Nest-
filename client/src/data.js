@@ -24,6 +24,7 @@ export const subCategories = {
     { id: "clips", name: "Hair Clips", image: "/images/Hairaccessories/hairaccessories1.jpeg", desc: "Floral, fun & dainty accents 🦋" },
     { id: "bandanas", name: "Bandanas", image: "/images/Hairaccessories/hairaccessories1.jpeg", desc: "Boho-chic & effortless headwraps 🌿" },
     { id: "headbands", name: "Headbands", image: "/images/Hairaccessories/hairaccessories1.jpeg", desc: "Cute, cozy & crown-like bands 👑" },
+    { id: "gajra", name: "Gajra", image: "/images/Hairaccessories/hairaccessories1.jpeg", desc: "Floral garlands for festive hair magic 🌸" },
   ],
   bouquets: [
     { id: "tulips", name: "Tulip Bouquets", image: "/images/Bouquets/tulips.jpg", desc: "Bright, cheerful & eternal blooms 🌷" },
@@ -422,6 +423,17 @@ export const products = [
     tag: "NEW", rating: 4.8, reviews: 4, stock: 9,
     colors: ["Gold & Cream", "Silver & White", "Pastel"],
     description: "Subtle sparkle for every day. This star-studded headband adds a touch of magic without overwhelming your look. ✨⭐"
+  },
+
+  // GAJRA
+  {
+    id: 56,
+    category: "hair", subCat: "gajra",
+    name: "Classic Gajra", price: 220,
+    image: "/images/Hairaccessories/hairaccessories1.jpeg", images: ["/images/Hairaccessories/hairaccessories1.jpeg"],
+    tag: "NEW", rating: 4.9, reviews: 3, stock: 8,
+    colors: ["Jasmine White", "Rose Pink", "Marigold Yellow"],
+    description: "A timeless floral gajra to elevate every braid and bun. Soft, fragrant-inspired charm for festive looks. 🌸✨"
   },
 
   // TULIP BOUQUETS

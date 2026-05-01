@@ -12,6 +12,21 @@ const MONTHS = [
   "July","August","September","October","November","December"
 ];
 
+const mergeSubCategories = (savedSubCats, fallbackSubCats) => {
+  const merged = {};
+  const allCats = new Set([
+    ...Object.keys(fallbackSubCats || {}),
+    ...Object.keys(savedSubCats || {})
+  ]);
+  allCats.forEach((catId) => {
+    const savedList = Array.isArray(savedSubCats?.[catId]) ? savedSubCats[catId] : [];
+    const fallbackList = Array.isArray(fallbackSubCats?.[catId]) ? fallbackSubCats[catId] : [];
+    const savedIds = new Set(savedList.map((sub) => sub.id));
+    merged[catId] = [...savedList, ...fallbackList.filter((sub) => !savedIds.has(sub.id))];
+  });
+  return merged;
+};
+
 export default function AdminDashboard({ goBack }) {
   // ── Global site config from context ───────────────────────
   const { refreshSiteConfig } = useSiteConfig();
@@ -146,7 +161,7 @@ export default function AdminDashboard({ goBack }) {
       if (res.ok) {
         const data = await res.json();
         const val = data.value;
-        if (!val.subCategories) val.subCategories = defaultSubCats;
+        val.subCategories = mergeSubCategories(val.subCategories, defaultSubCats);
         setSiteConfig(val);
       } else {
         setSiteConfig({
@@ -154,7 +169,7 @@ export default function AdminDashboard({ goBack }) {
           categories: [
             { id: "keychains", name: "Crochet Keychains", icon: "🔑", desc: "Cute companions for your keys & bags", accent: "#7c3aed" },
             { id: "plushies",  name: "Crochet Plushies",  icon: "🧸", desc: "Tiny huggable handmade friends",        accent: "#f59e0b" },
-            { id: "hair",      name: "Hair Accessories",  icon: "🎀", desc: "Floral clips, scrunchies & bandanas",   accent: "#db2777" },
+            { id: "hair",      name: "Hair Accessories",  icon: "🎀", desc: "Floral clips, scrunchies, gajras & bandanas",   accent: "#db2777" },
             { id: "bouquets",  name: "Crochet Bouquets",  icon: "💐", desc: "Flowers that never fade",               accent: "#dc2626" },
           ],
           subCategories: defaultSubCats

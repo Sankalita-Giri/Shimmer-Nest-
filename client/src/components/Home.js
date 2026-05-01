@@ -21,7 +21,7 @@ const PLUSHIES_IMAGES = [
 const DEFAULT_CATEGORIES = [
   { id: "keychains", name: "Crochet Keychains", icon: "🔑", gradient: "from-violet-100 to-blue-50", accent: "#7c3aed", desc: "Cute companions for your keys & bags", images: KEYCHAIN_IMAGES },
   { id: "plushies", name: "Crochet Plushies", icon: "🧸", gradient: "from-yellow-50 to-orange-50", accent: "#f59e0b", desc: "Tiny huggable handmade friends", images: PLUSHIES_IMAGES },
-  { id: "hair", name: "Hair Accessories", icon: "🎀", gradient: "from-rose-100 to-pink-50", accent: "#db2777", desc: "Floral clips, scrunchies & bandanas", images: [] },
+  { id: "hair", name: "Hair Accessories", icon: "🎀", gradient: "from-rose-100 to-pink-50", accent: "#db2777", desc: "Floral clips, scrunchies, gajras & bandanas", images: [] },
   { id: "bouquets", name: "Crochet Bouquets", icon: "💐", gradient: "from-red-50 to-orange-50", accent: "#dc2626", desc: "Flowers that never fade", images: [] },
 ];
 

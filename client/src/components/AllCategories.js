@@ -15,7 +15,7 @@ const CATEGORY_PREVIEWS = {
 const CATEGORIES = [
   { id: "keychains", name: "Crochet Keychains", icon: "🔑", gradient: "from-violet-100 to-blue-50", accent: "#7c3aed", desc: "Cute companions for your keys & bags" },
   { id: "plushies", name: "Crochet Plushies", icon: "🧸", gradient: "from-yellow-50 to-orange-50", accent: "#f59e0b", desc: "Cuddle-worthy handmade friends" },
-  { id: "hair", name: "Hair Accessories", icon: "🎀", gradient: "from-rose-100 to-pink-50", accent: "#db2777", desc: "Floral clips, scrunchies & bandanas" },
+  { id: "hair", name: "Hair Accessories", icon: "🎀", gradient: "from-rose-100 to-pink-50", accent: "#db2777", desc: "Floral clips, scrunchies, gajras & bandanas" },
   { id: "bouquets", name: "Crochet Bouquets", icon: "💐", gradient: "from-red-50 to-orange-50", accent: "#dc2626", desc: "Flowers that never fade" },
 ];
 
