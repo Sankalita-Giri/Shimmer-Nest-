@@ -16,6 +16,7 @@ const productSchema = new mongoose.Schema({
   variants: [{
     name: String,
     price: Number,
+    stock: { type: Number, default: 0 },
     imageIndex: Number
   }],
   description: { type: String },

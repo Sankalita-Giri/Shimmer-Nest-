@@ -31,7 +31,22 @@ export function SiteConfigProvider({ children }) {
         const data = await res.json();
         const val = data.value;
         // Merge in defaults for any fields not yet saved to DB
-        if (!val.subCategories) val.subCategories = defaultSubCats;
+        if (!val.subCategories) {
+          val.subCategories = defaultSubCats;
+        } else {
+          // Merge any missing subcategories from defaults
+          Object.keys(defaultSubCats).forEach(catId => {
+            if (!val.subCategories[catId]) {
+              val.subCategories[catId] = [...defaultSubCats[catId]];
+            } else {
+              defaultSubCats[catId].forEach(defaultSub => {
+                if (!val.subCategories[catId].find(s => s.id === defaultSub.id)) {
+                  val.subCategories[catId].push(defaultSub);
+                }
+              });
+            }
+          });
+        }
         // Ensure gradient field on categories (stored in DB may not have it)
         const GRADIENTS = {
           keychains: "from-violet-100 to-blue-50",

@@ -146,7 +146,22 @@ export default function AdminDashboard({ goBack }) {
       if (res.ok) {
         const data = await res.json();
         const val = data.value;
-        if (!val.subCategories) val.subCategories = defaultSubCats;
+        if (!val.subCategories) {
+          val.subCategories = defaultSubCats;
+        } else {
+          // Merge any missing subcategories from defaults
+          Object.keys(defaultSubCats).forEach(catId => {
+            if (!val.subCategories[catId]) {
+              val.subCategories[catId] = [...defaultSubCats[catId]];
+            } else {
+              defaultSubCats[catId].forEach(defaultSub => {
+                if (!val.subCategories[catId].find(s => s.id === defaultSub.id)) {
+                  val.subCategories[catId].push(defaultSub);
+                }
+              });
+            }
+          });
+        }
         setSiteConfig(val);
       } else {
         setSiteConfig({
@@ -230,6 +245,7 @@ export default function AdminDashboard({ goBack }) {
     );
   }
 
+  // eslint-disable-next-line no-unused-vars
   const availableMonths = monthlyStats.map(m => ({ value: m.key, label: m.label }));
 
   return (

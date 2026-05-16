@@ -1,17 +1,21 @@
 import React from 'react';
-import { subCategories } from "../data";
+import { subCategories as defaultSubCats } from "../data";
 import { useTheme } from '../context/ThemeContext';
+import { useSiteConfig } from '../context/SiteConfigContext';
 import SkeletonCard from './SkeletonCard';
 
 export default function ProductList({ category, subCat, setSelectedProduct, setView, goBack, products, loading }) {
   const { dark } = useTheme();
+
+  const { siteConfig } = useSiteConfig();
 
   const items = products ? products.filter(p =>
     p.category?.toLowerCase() === category?.toLowerCase() &&
     p.subCat?.toLowerCase() === subCat?.toLowerCase()
   ) : [];
 
-  const subCatData = subCategories[category]?.find(s => s.id === subCat);
+  const currentSubCats = siteConfig?.subCategories?.[category] || defaultSubCats[category] || [];
+  const subCatData = currentSubCats.find(s => s.id === subCat);
   const subCatName = subCatData ? subCatData.name : subCat;
 
   return (

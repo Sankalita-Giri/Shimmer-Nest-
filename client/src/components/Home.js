@@ -237,8 +237,14 @@ export default function Home({ setView, setActiveCat, setSelectedProduct, produc
                         {p.image && (
                           <img src={p.image} alt={p.name}
                             className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 z-10"
-                            onError={(e) => { e.target.style.display = 'none'; }} />
+                            onError={(e) => {
+                              e.target.style.opacity = '0';
+                              e.target.nextSibling.style.display = 'flex';
+                            }} />
                         )}
+                        <div className="absolute inset-0 hidden items-center justify-center bg-purple-50/50 text-4xl opacity-40 z-0">
+                          {cat.icon}
+                        </div>
                       </div>
                     )) : [1, 2, 3].map(j => (
                       <div key={j} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-white shadow-md bg-white/50">
@@ -302,8 +308,14 @@ export default function Home({ setView, setActiveCat, setSelectedProduct, produc
                         {p.image && (
                           <img src={p.image} alt={p.name}
                             className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 z-10"
-                            onError={(e) => { e.target.style.display = 'none'; }} />
+                            onError={(e) => {
+                              e.target.style.opacity = '0';
+                              e.target.nextSibling.style.display = 'flex';
+                            }} />
                         )}
+                        <div className="absolute inset-0 hidden items-center justify-center bg-purple-50/50 text-4xl opacity-40 z-0">
+                          {cat.icon}
+                        </div>
                       </div>
                     )) : [1, 2, 3].map(j => (
                       <div key={j} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-white shadow-md bg-white/50">
@@ -363,8 +375,14 @@ export default function Home({ setView, setActiveCat, setSelectedProduct, produc
                         {p.image && (
                           <img src={p.image} alt={p.name}
                             className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 z-10"
-                            onError={(e) => { e.target.style.display = 'none'; }} />
+                            onError={(e) => {
+                              e.target.style.opacity = '0';
+                              e.target.nextSibling.style.display = 'flex';
+                            }} />
                         )}
+                        <div className="absolute inset-0 hidden items-center justify-center bg-purple-50/50 text-4xl opacity-40 z-0">
+                          {cat.icon}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -401,13 +419,19 @@ export default function Home({ setView, setActiveCat, setSelectedProduct, produc
             ].map((tier, i) => {
               // Filter products that actually HAVE working images (not placeholders)
               // We'll prioritize products known to have good images
-              const knownGoodIds = [1, 8, 16, 12, 20, 19, 54, 21, 2, 9, 10, 11];
+              const knownGoodIds = [1, 2, 3, 5, 8, 9, 10, 11, 12, 13, 16, 19, 20, 21, 22, 52, 53, 54, 55];
               const available = products.filter(p => p.price >= tier.priceRange[0] && p.price < tier.priceRange[1]);
 
               // Sort to put known good products first, then others
               const sorted = [...available].sort((a, b) => {
                 const aGood = knownGoodIds.includes(Number(a.id)) ? 1 : 0;
                 const bGood = knownGoodIds.includes(Number(b.id)) ? 1 : 0;
+                // Secondary sort: ensure they HAVE an image path
+                if (aGood === bGood) {
+                  const aHasImg = a.image && !a.image.includes('placeholder') ? 1 : 0;
+                  const bHasImg = b.image && !b.image.includes('placeholder') ? 1 : 0;
+                  return bHasImg - aHasImg;
+                }
                 return bGood - aGood;
               });
 
@@ -429,8 +453,14 @@ export default function Home({ setView, setActiveCat, setSelectedProduct, produc
                           {p.image && (
                             <img src={p.image} alt={p.name}
                               className="absolute inset-0 w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500 z-10"
-                              onError={(e) => { e.target.style.display = 'none'; }} />
+                              onError={(e) => {
+                                e.target.style.opacity = '0';
+                                e.target.nextSibling.style.display = 'flex';
+                              }} />
                           )}
+                          <div className="absolute inset-0 hidden items-center justify-center bg-white/60 text-3xl opacity-50 z-0">
+                            {tier.emoji}
+                          </div>
                         </div>
                         <p className={`text-[8px] font-black text-center truncate w-full px-1 ${dark ? 'text-purple-300' : 'text-gray-500'}`}>{p.name}</p>
                       </div>

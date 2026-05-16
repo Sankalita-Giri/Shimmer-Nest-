@@ -24,12 +24,14 @@ export const subCategories = {
     { id: "clips", name: "Hair Clips", image: "/images/Hairaccessories/hairaccessories1.jpeg", desc: "Floral, fun & dainty accents 🦋" },
     { id: "bandanas", name: "Bandanas", image: "/images/Hairaccessories/hairaccessories1.jpeg", desc: "Boho-chic & effortless headwraps 🌿" },
     { id: "headbands", name: "Headbands", image: "/images/Hairaccessories/hairaccessories1.jpeg", desc: "Cute, cozy & crown-like bands 👑" },
+    { id: "gajras", name: "Crochet Gajras", image: "/images/Hairaccessories/hairaccessories1.jpeg", desc: "Traditional elegance woven with love 🌸" },
   ],
   bouquets: [
     { id: "tulips", name: "Tulip Bouquets", image: "/images/Bouquets/tulips.jpg", desc: "Bright, cheerful & eternal blooms 🌷" },
     { id: "roses", name: "Rose Bouquets", image: "/images/Bouquets/roses.jpg", desc: "Timeless, romantic & forever roses 🌹" },
     { id: "sunflowers", name: "Sunflowers", image: "/images/Bouquets/sunflowers.jpg", desc: "Handcrafted golden sunshine in every loop 🌻✨" },
-    { id: "mini-b", name: "Mini Bouquets", image: "/images/Bouquets/mini-b.jpg", desc: "Tiny, gifting-perfect floral bundles 🎀" },
+    { id: "mini-b", name: "Daisy Bouquets", image: "/images/Bouquets/mini-b.jpg", desc: "Peaceful floral bundles 🎀" },
+    { id: "animals", name: "Animal Bouquets", image: "/images/Bouquets/bouquet1.jpeg", desc: "Cute, cuddly & creative character bouquets 🧸💐" },
   ],
 };
 
@@ -179,7 +181,7 @@ export const products = [
     id: 14,
     category: "keychains", subCat: "couple-key",
     name: "Lock & Key Set", price: 299,
-    image: "/images/Keychains/lock-key-set-k.jpg", images: ["/images/Keychains/lock-key-set-k.jpg"],
+    image: "/images/Keychains/couple1.jpg", images: ["/images/Keychains/couple1.jpg"],
     tag: "GIFT", rating: 4.9, reviews: 10, stock: 6,
     colors: ["Gold", "Silver", "Pastel Pink"],
     description: "Hold the key to each other's hearts! This charming lock and key set is a symbolic and sweet gift for your favorite person. 🔑🔒"
@@ -188,7 +190,7 @@ export const products = [
     id: 15,
     category: "keychains", subCat: "couple-key",
     name: "Paw & Heart Set", price: 280,
-    image: "/images/Keychains/paw-heart-k.jpg", images: ["/images/Keychains/paw-heart-k.jpg"],
+    image: "/images/Keychains/couple1.jpg", images: ["/images/Keychains/couple1.jpg"],
     tag: "NEW", rating: 5, reviews: 4, stock: 8,
     colors: ["Original", "Terracotta", "Blush"],
     description: "Paws-itively perfect for animal lovers! A matching paw and heart set to celebrate your shared love for your furry friends. 🐾💕"
@@ -208,7 +210,7 @@ export const products = [
     id: 17,
     category: "keychains", subCat: "genderless-key",
     name: "Rainbow Bar", price: 160,
-    image: "/images/Keychains/rainbow-k.jpg", images: ["/images/Keychains/rainbow-k.jpg"],
+    image: "/images/Keychains/pawkeychain1.jpg", images: ["/images/Keychains/pawkeychain1.jpg"],
     tag: "POPULAR", rating: 5, reviews: 8, stock: 10,
     colors: ["Classic Rainbow", "Pastel Rainbow", "Monochrome"],
     description: "Carry a pocketful of sunshine and color! This vibrant rainbow bar is a celebration of joy and handmade artistry. 🌈✨"
@@ -217,7 +219,7 @@ export const products = [
     id: 18,
     category: "keychains", subCat: "genderless-key",
     name: "Mushroom Cap", price: 150,
-    image: "/images/Keychains/mushroom-k.jpg", images: ["/images/Keychains/mushroom-k.jpg"],
+    image: "/images/Keychains/pawkeychain1.jpg", images: ["/images/Keychains/pawkeychain1.jpg"],
     tag: "TRENDING", rating: 4.9, reviews: 12, stock: 9,
     colors: ["Red & White", "Brown", "Pastel"],
     description: "Step into a fairytale with this cottagecore mushroom! A whimsical little charm that brings a touch of forest magic to your day. 🍄🌿"
@@ -306,7 +308,7 @@ export const products = [
     id: 25,
     category: "hair", subCat: "clips",
     name: "Rose Petal Clip", price: 130,
-    image: "/images/Hairaccessories/rose-clip.jpg", images: ["/images/Hairaccessories/rose-clip.jpg"],
+    image: "/images/Hairaccessories/hairaccessories1.jpeg", images: ["/images/Hairaccessories/hairaccessories1.jpeg"],
     tag: "NEW", rating: 5, reviews: 6, stock: 8,
     colors: ["Red", "Blush Pink", "Cream", "Burgundy"],
     description: "Timeless romance for your tresses. This soft rose petal clip adds an effortless touch of elegance to your look. 🌹✨"
@@ -315,7 +317,7 @@ export const products = [
     id: 26,
     category: "hair", subCat: "clips",
     name: "Butterfly Clip", price: 110,
-    image: "/images/Hairaccessories/butterfly-clip.jpg", images: ["/images/Hairaccessories/butterfly-clip.jpg"],
+    image: "/images/Hairaccessories/hairaccessories1.jpeg", images: ["/images/Hairaccessories/hairaccessories1.jpeg"],
     tag: "POPULAR", rating: 4.9, reviews: 9, stock: 11,
     colors: ["Lilac", "Coral", "Mint", "Baby Blue"],
     description: "Flutter into fashion! This dainty butterfly clip is a whimsical and beautiful addition to braids or buns. 🦋✨"
@@ -324,7 +326,7 @@ export const products = [
     id: 27,
     category: "hair", subCat: "clips",
     name: "Daisy Duo Clip", price: 100,
-    image: "/images/Hairaccessories/daisy-clip.jpg", images: ["/images/Hairaccessories/daisy-clip.jpg"],
+    image: "/images/Hairaccessories/hairaccessories1.jpeg", images: ["/images/Hairaccessories/hairaccessories1.jpeg"],
     tag: "BESTSELLER", rating: 5, reviews: 14, stock: 13,
     colors: ["White & Yellow", "Pastel", "Multicolor"],
     description: "Double the daisies, double the charm! A sweet duo of flowers to brighten up your hair and your day. 🌼🌼✨"
@@ -333,7 +335,7 @@ export const products = [
     id: 28,
     category: "hair", subCat: "clips",
     name: "Star Cluster Clip", price: 115,
-    image: "/images/Hairaccessories/star-clip.jpg", images: ["/images/Hairaccessories/star-clip.jpg"],
+    image: "/images/Hairaccessories/hairaccessories1.jpeg", images: ["/images/Hairaccessories/hairaccessories1.jpeg"],
     tag: "NEW", rating: 4.8, reviews: 5, stock: 7,
     colors: ["Gold", "Silver", "Pastel Yellow"],
     description: "Sparkle like the night sky! A cluster of tiny stars to add a touch of celestial magic to your hairstyle. ✨⭐"
@@ -344,7 +346,7 @@ export const products = [
     id: 29,
     category: "hair", subCat: "bandanas",
     name: "Boho Bandana", price: 200,
-    image: "/images/Hairaccessories/bandana-cat.jpg", images: ["/images/Hairaccessories/bandana-cat.jpg"],
+    image: "/images/Hairaccessories/hairaccessories1.jpeg", images: ["/images/Hairaccessories/hairaccessories1.jpeg"],
     tag: "NEW", rating: 4.8, reviews: 3, stock: 7,
     colors: ["Original", "Terracotta", "Sage"],
     description: "Unleash your inner free spirit! This boho-inspired bandana is handcrafted for effortless style and cozy vibes. 🌿🧶"
@@ -353,7 +355,7 @@ export const products = [
     id: 30,
     category: "hair", subCat: "bandanas",
     name: "Floral Bandana", price: 220,
-    image: "/images/Hairaccessories/floral-bandana.jpg", images: ["/images/Hairaccessories/floral-bandana.jpg"],
+    image: "/images/Hairaccessories/hairaccessories1.jpeg", images: ["/images/Hairaccessories/hairaccessories1.jpeg"],
     tag: "POPULAR", rating: 5, reviews: 8, stock: 6,
     colors: ["Blush & Cream", "Lavender & White", "Peach"],
     description: "A field of flowers on your head! This floral-detailed bandana is the ultimate accessory for a soft, aesthetic look. 🌸✨"
@@ -362,7 +364,7 @@ export const products = [
     id: 31,
     category: "hair", subCat: "bandanas",
     name: "Stripe Bandana", price: 180,
-    image: "/images/Hairaccessories/stripe-bandana.jpg", images: ["/images/Hairaccessories/stripe-bandana.jpg"],
+    image: "/images/Hairaccessories/hairaccessories1.jpeg", images: ["/images/Hairaccessories/hairaccessories1.jpeg"],
     tag: "HANDMADE", rating: 4.7, reviews: 5, stock: 9,
     colors: ["Cream & Brown", "Black & White", "Pastel Stripe"],
     description: "Minimalist cool meets handmade warmth. This striped bandana is a versatile piece that complements any outfit. 🤍🧶"
@@ -371,7 +373,7 @@ export const products = [
     id: 32,
     category: "hair", subCat: "bandanas",
     name: "Pom Pom Bandana", price: 240,
-    image: "/images/Hairaccessories/pompom-bandana.jpg", images: ["/images/Hairaccessories/pompom-bandana.jpg"],
+    image: "/images/Hairaccessories/hairaccessories1.jpeg", images: ["/images/Hairaccessories/hairaccessories1.jpeg"],
     tag: "TRENDING", rating: 5, reviews: 7, stock: 5,
     colors: ["Multicolor", "Pastel Rainbow", "Monochrome"],
     description: "Fun, bold, and full of life! This pom-pom detailed bandana is for those who love to stand out with handmade flair. 🎉🧶"
@@ -382,7 +384,7 @@ export const products = [
     id: 33,
     category: "hair", subCat: "headbands",
     name: "Knot Headband", price: 160,
-    image: "/images/Hairaccessories/knot-headband.jpg", images: ["/images/Hairaccessories/knot-headband.jpg"],
+    image: "/images/Hairaccessories/hairaccessories1.jpeg", images: ["/images/Hairaccessories/hairaccessories1.jpeg"],
     tag: "BESTSELLER", rating: 5, reviews: 18, stock: 12,
     colors: ["Cream", "Blush", "Sage", "Midnight"],
     description: "Cozy chic at its best! This knotted headband is the perfect soft accessory to keep your hair stylish and in place. 🎀✨"
@@ -391,7 +393,7 @@ export const products = [
     id: 34,
     category: "hair", subCat: "headbands",
     name: "Daisy Headband", price: 180,
-    image: "/images/Hairaccessories/daisy-headband.jpg", images: ["/images/Hairaccessories/daisy-headband.jpg"],
+    image: "/images/Hairaccessories/hairaccessories1.jpeg", images: ["/images/Hairaccessories/hairaccessories1.jpeg"],
     tag: "NEW", rating: 5, reviews: 9, stock: 8,
     colors: ["White & Yellow", "Pastel", "All White"],
     description: "Cottagecore dreams come true! A row of delicate daisies to crown your look with pure, handmade charm. 🌼✨"
@@ -400,7 +402,7 @@ export const products = [
     id: 35,
     category: "hair", subCat: "headbands",
     name: "Wide Petal Band", price: 190,
-    image: "/images/Hairaccessories/petal-headband.jpg", images: ["/images/Hairaccessories/petal-headband.jpg"],
+    image: "/images/Hairaccessories/hairaccessories1.jpeg", images: ["/images/Hairaccessories/hairaccessories1.jpeg"],
     tag: "HANDMADE", rating: 4.9, reviews: 6, stock: 7,
     colors: ["Blush", "Lavender", "Terracotta"],
     description: "Inspired by nature's beauty. This wide petal headband is soft, stretchy, and elegantly handcrafted for you. 🌸✨"
@@ -409,7 +411,7 @@ export const products = [
     id: 36,
     category: "hair", subCat: "headbands",
     name: "Bunny Ear Band", price: 200,
-    image: "/images/Hairaccessories/bunny-headband.jpg", images: ["/images/Hairaccessories/bunny-headband.jpg"],
+    image: "/images/Hairaccessories/hairaccessories1.jpeg", images: ["/images/Hairaccessories/hairaccessories1.jpeg"],
     tag: "POPULAR", rating: 5, reviews: 13, stock: 10,
     colors: ["White", "Pastel Pink", "Cream"],
     description: "Hop into cuteness! These adorable bunny ears on a headband are the ultimate fun accessory for kids and kids at heart. 🐰✨"
@@ -418,7 +420,7 @@ export const products = [
     id: 37,
     category: "hair", subCat: "headbands",
     name: "Star Stud Band", price: 170,
-    image: "/images/Hairaccessories/star-headband.jpg", images: ["/images/Hairaccessories/star-headband.jpg"],
+    image: "/images/Hairaccessories/hairaccessories1.jpeg", images: ["/images/Hairaccessories/hairaccessories1.jpeg"],
     tag: "NEW", rating: 4.8, reviews: 4, stock: 9,
     colors: ["Gold & Cream", "Silver & White", "Pastel"],
     description: "Subtle sparkle for every day. This star-studded headband adds a touch of magic without overwhelming your look. ✨⭐"
@@ -429,7 +431,7 @@ export const products = [
     id: 38,
     category: "bouquets", subCat: "tulips",
     name: "Pink Tulip Trio", price: 350,
-    image: "/images/Bouquets/pink-tulip.jpg", images: ["/images/Bouquets/pink-tulip.jpg"],
+    image: "/images/Bouquets/bouquet1.jpeg", images: ["/images/Bouquets/bouquet1.jpeg"],
     tag: "GIFT", rating: 5, reviews: 15, stock: 4,
     colors: ["Pink", "White", "Lavender"],
     description: "A gift of eternal spring! Three perfectly crocheted tulips that will stay bright and beautiful forever. 🌷🌷🌷"
@@ -438,7 +440,7 @@ export const products = [
     id: 39,
     category: "bouquets", subCat: "tulips",
     name: "Tulip Bunch (x5)", price: 520,
-    image: "/images/Bouquets/tulip-bunch.jpg", images: ["/images/Bouquets/tulip-bunch.jpg"],
+    image: "/images/Bouquets/bouquet1.jpeg", images: ["/images/Bouquets/bouquet1.jpeg"],
     tag: "POPULAR", rating: 5, reviews: 9, stock: 3,
     colors: ["Mixed", "All Pink", "All White", "All Purple"],
     description: "A burst of floral joy! Five vibrant tulips bundled together to bring a touch of handmade nature into your home. 🌷🌷🌷🌷🌷"
@@ -449,7 +451,7 @@ export const products = [
     id: 40,
     category: "bouquets", subCat: "roses",
     name: "Eternal Red Rose", price: 499,
-    image: "/images/Bouquets/rose-b.jpg", images: ["/images/Bouquets/rose-b.jpg"],
+    image: "/images/Bouquets/bouquet1.jpeg", images: ["/images/Bouquets/bouquet1.jpeg"],
     tag: "ROMANTIC", rating: 5, reviews: 32, stock: 3,
     colors: ["Red", "Pink", "Cream"],
     description: "The ultimate symbol of love, made to last. This single eternal rose is handcrafted for someone truly special. 🌹✨"
@@ -458,7 +460,7 @@ export const products = [
     id: 41,
     category: "bouquets", subCat: "roses",
     name: "Rose Trio", price: 699,
-    image: "/images/Bouquets/rose-trio.jpg", images: ["/images/Bouquets/rose-trio.jpg"],
+    image: "/images/Bouquets/bouquet1.jpeg", images: ["/images/Bouquets/bouquet1.jpeg"],
     tag: "BESTSELLER", rating: 5, reviews: 19, stock: 4,
     colors: ["Red", "Mixed", "Pink & Cream"],
     description: "A trio of romantic roses that never fade. The perfect forever bouquet to celebrate love and beauty. 🌹🌹🌹"
@@ -467,7 +469,7 @@ export const products = [
     id: 42,
     category: "bouquets", subCat: "roses",
     name: "Pastel Rose Bunch", price: 799,
-    image: "/images/Bouquets/pastel-roses.jpg", images: ["/images/Bouquets/pastel-roses.jpg"],
+    image: "/images/Bouquets/bouquet1.jpeg", images: ["/images/Bouquets/bouquet1.jpeg"],
     tag: "NEW", rating: 5, reviews: 7, stock: 3,
     colors: ["Blush & Cream", "Lavender & White", "Peach"],
     description: "Pastel perfection! A dreamy bunch of soft-hued roses that bring a calm and beautiful aesthetic to any space. 🌸✨"
@@ -487,7 +489,7 @@ export const products = [
     id: 44,
     category: "bouquets", subCat: "sunflowers",
     name: "Solo Sunflower", price: 220,
-    image: "/images/Bouquets/solo-sunflower.jpg", images: ["/images/Bouquets/solo-sunflower.jpg"],
+    image: "/images/Bouquets/bouquet1.jpeg", images: ["/images/Bouquets/bouquet1.jpeg"],
     tag: "NEW", rating: 4.9, reviews: 6, stock: 8,
     colors: ["Classic Yellow", "Pale Yellow", "Orange Tip"],
     description: "Bold, bright, and beautiful. A single sunflower that stands tall and brings a ray of light wherever it goes. 🌻☀️"
@@ -498,7 +500,7 @@ export const products = [
     id: 45,
     category: "bouquets", subCat: "mixed",
     name: "Garden Mix Bouquet", price: 650,
-    image: "/images/Bouquets/garden-mix-b.jpg", images: ["/images/Bouquets/garden-mix-b.jpg"],
+    image: "/images/Bouquets/bouquet1.jpeg", images: ["/images/Bouquets/bouquet1.jpeg"],
     tag: "GIFT", rating: 5, reviews: 10, stock: 4,
     colors: ["Pastel Mix", "Bold Mix", "Seasonal"],
     description: "Nature's best, hand-picked for you. A whimsical mix of roses, tulips, and daisies in one unique, handmade bouquet. 🌷🌹🌼"
@@ -507,7 +509,7 @@ export const products = [
     id: 46,
     category: "bouquets", subCat: "mixed",
     name: "Rainbow Wildflower Bunch", price: 580,
-    image: "/images/Bouquets/wildflower-b.jpg", images: ["/images/Bouquets/wildflower-b.jpg"],
+    image: "/images/Bouquets/bouquet1.jpeg", images: ["/images/Bouquets/bouquet1.jpeg"],
     tag: "POPULAR", rating: 5, reviews: 8, stock: 5,
     colors: ["Original", "Pastel Rainbow", "Warm Tones"],
     description: "A vibrant explosion of color! These rainbow wildflowers are a celebration of nature's diversity and handmade art. 🌈🌸"
@@ -518,7 +520,7 @@ export const products = [
     id: 47,
     category: "bouquets", subCat: "mini-b",
     name: "Mini Rose Trio", price: 320,
-    image: "/images/Bouquets/mini-rose-b.jpg", images: ["/images/Bouquets/mini-rose-b.jpg"],
+    image: "/images/Bouquets/bouquet1.jpeg", images: ["/images/Bouquets/bouquet1.jpeg"],
     tag: "NEW", rating: 5, reviews: 5, stock: 6,
     colors: ["Red", "Pink", "Mixed"],
     description: "Tiny but mighty! A trio of mini roses that are the perfect thoughtful gift or a sweet addition to your desk. 🌹🌹🌹"
@@ -527,7 +529,7 @@ export const products = [
     id: 49,
     category: "bouquets", subCat: "mini-b",
     name: "Pocket Daisy Bunch", price: 280,
-    image: "/images/Bouquets/pocket-daisy-b.jpg", images: ["/images/Bouquets/pocket-daisy-b.jpg"],
+    image: "/images/Bouquets/bouquet1.jpeg", images: ["/images/Bouquets/bouquet1.jpeg"],
     tag: "BESTSELLER", rating: 4.9, reviews: 11, stock: 7,
     colors: ["White & Yellow", "Pastel", "Multicolor"],
     description: "Pocket-sized happiness! This bundle of daisies is perfect for gifting or adding a touch of cottagecore charm to a small vase. 🌼✨"

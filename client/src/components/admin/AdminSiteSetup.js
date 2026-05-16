@@ -1,4 +1,5 @@
 import React from 'react';
+import { subCategories as defaultSubCats } from '../../data';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -68,6 +69,10 @@ export default function AdminSiteSetup({
       const data = await res.json();
       if (res.ok) {
         const newConfig = { ...siteConfig };
+        if (!newConfig.subCategories) newConfig.subCategories = {};
+        if (!newConfig.subCategories[catId]) {
+          newConfig.subCategories[catId] = [...(defaultSubCats[catId] || [])];
+        }
         newConfig.subCategories[catId][subIdx].image = data.url;
         saveSiteConfig(newConfig);
       }
@@ -179,11 +184,24 @@ export default function AdminSiteSetup({
           </div>
         </div>
         <div className="space-y-12">
-          {siteConfig.categories.map((cat) => (
-            <div key={cat.id} className="space-y-6">
-              <h3 className="text-xl font-black text-purple-700 uppercase tracking-widest border-b-2 border-purple-100 pb-2 ml-2">{cat.name}</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {(siteConfig.subCategories?.[cat.id] || []).map((sub, subIdx) => (
+          {siteConfig.categories.map((cat) => {
+            const dbSubs = siteConfig.subCategories?.[cat.id] || [];
+            const defSubs = defaultSubCats[cat.id] || [];
+            
+            // Merge: Use DB sub if it exists, otherwise use default
+            // This ensures new categories added to data.js show up in admin
+            const allSubs = [...dbSubs];
+            defSubs.forEach(def => {
+              if (!allSubs.find(s => s.id === def.id)) {
+                allSubs.push(def);
+              }
+            });
+
+            return (
+              <div key={cat.id} className="space-y-6">
+                <h3 className="text-xl font-black text-purple-700 uppercase tracking-widest border-b-2 border-purple-100 pb-2 ml-2">{cat.name}</h3>
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {allSubs.map((sub, subIdx) => (
                   <div key={sub.id} className="bg-gray-50 p-6 rounded-3xl border-2 border-gray-100 hover:border-purple-200 transition-colors flex flex-col">
                     <div className="flex gap-4 mb-4">
                       <div className="relative group w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg flex-none bg-white">
@@ -200,7 +218,12 @@ export default function AdminSiteSetup({
                         <div>
                           <label className="text-[8px] font-black text-gray-400 uppercase tracking-widest ml-1">Name</label>
                           <input type="text" value={sub.name}
-                            onChange={(e) => { const newConfig = { ...siteConfig }; newConfig.subCategories[cat.id][subIdx].name = e.target.value; setSiteConfig(newConfig); }}
+                            onChange={(e) => { 
+                              const newConfig = { ...siteConfig };
+                              if (!newConfig.subCategories[cat.id]) newConfig.subCategories[cat.id] = [...allSubs];
+                              newConfig.subCategories[cat.id][subIdx].name = e.target.value; 
+                              setSiteConfig(newConfig); 
+                            }}
                             className="w-full p-2.5 bg-white rounded-xl text-sm font-black shadow-sm border border-gray-100" />
                         </div>
                       </div>
@@ -208,18 +231,24 @@ export default function AdminSiteSetup({
                     <div className="mt-auto">
                       <label className="text-[8px] font-black text-gray-400 uppercase tracking-widest ml-1">Description</label>
                       <input type="text" value={sub.desc}
-                        onChange={(e) => { const newConfig = { ...siteConfig }; newConfig.subCategories[cat.id][subIdx].desc = e.target.value; setSiteConfig(newConfig); }}
+                        onChange={(e) => { 
+                          const newConfig = { ...siteConfig };
+                          if (!newConfig.subCategories[cat.id]) newConfig.subCategories[cat.id] = [...allSubs];
+                          newConfig.subCategories[cat.id][subIdx].desc = e.target.value; 
+                          setSiteConfig(newConfig); 
+                        }}
                         className="w-full p-2.5 bg-white rounded-xl text-xs font-medium shadow-sm border border-gray-100 mb-4" />
                       <button onClick={() => saveSiteConfig(siteConfig)}
                         className="w-full py-2.5 bg-purple-100 text-purple-700 hover:bg-purple-600 hover:text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-sm transition-colors">
                         Save {sub.name}
                       </button>
                     </div>
-                  </div>
-                ))}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

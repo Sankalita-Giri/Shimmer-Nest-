@@ -9,13 +9,14 @@ export default function ProductDetail({ product, addToCart, goBack, navigateToCa
   const { dark } = useTheme();
 
   // Handle variants (different prices/images per selection)
-  const [selectedVariant, setSelectedVariant] = useState(product.variants ? product.variants[0] : null);
-  const [color, setColor] = useState("Original");
-  const [mainImg, setMainImg] = useState(product.image);
-
+  const hasVariants = product.variants && product.variants.length > 0;
+  const [selectedVariant, setSelectedVariant] = useState(hasVariants ? product.variants[0] : null);
   const outOfStock = product.stock !== undefined && product.stock <= 0;
   const allImages = product.images || [product.image];
   const colorOptions = product.colors?.length > 0 ? product.colors : ["Original", "Pastel", "Midnight"];
+
+  const [color, setColor] = useState(colorOptions[0]);
+  const [mainImg, setMainImg] = useState(product.image);
 
   const currentPrice = selectedVariant ? selectedVariant.price : product.price;
   const currentColor = selectedVariant ? selectedVariant.name : color;
@@ -24,6 +25,21 @@ export default function ProductDetail({ product, addToCart, goBack, navigateToCa
     setSelectedVariant(v);
     if (v.imageIndex !== undefined && allImages[v.imageIndex]) {
       setMainImg(allImages[v.imageIndex]);
+    }
+  };
+
+  const handleThumbnailClick = (img, index) => {
+    setMainImg(img);
+    if (product.variants && product.variants.length > 0) {
+      // Find the first variant that matches this image index
+      const variant = product.variants.find(v => String(v.imageIndex) === String(index));
+      // If found, select it; otherwise, stay on current or reset to null to show base price
+      if (variant) {
+        setSelectedVariant(variant);
+      } else {
+        // Optional: Reset to null if you want to show base price for images with no variant
+        // setSelectedVariant(null);
+      }
     }
   };
 
@@ -86,7 +102,7 @@ export default function ProductDetail({ product, addToCart, goBack, navigateToCa
                         key={i}
                         src={img}
                         alt={`colour ${i + 1}`}
-                        onClick={() => setMainImg(img)}
+                        onClick={() => handleThumbnailClick(img, i)}
                         className={`aspect-square rounded-xl cursor-pointer object-cover transition-all hover:scale-110 ${
                           mainImg === img
                             ? 'ring-2 ring-purple-500 ring-offset-1 scale-110'
@@ -105,7 +121,7 @@ export default function ProductDetail({ product, addToCart, goBack, navigateToCa
                       key={i}
                       src={img}
                       alt="thumbnail"
-                      onClick={() => setMainImg(img)}
+                      onClick={() => handleThumbnailClick(img, i)}
                       className={`w-20 h-20 flex-none rounded-2xl cursor-pointer border-4 object-cover transition-all ${
                         mainImg === img
                           ? 'border-purple-400 scale-105'
@@ -165,7 +181,7 @@ export default function ProductDetail({ product, addToCart, goBack, navigateToCa
               Select Shade — <span className="text-purple-500">{currentColor}</span>
             </p>
             <div className="flex flex-wrap gap-3">
-              {product.variants ? (
+              {hasVariants ? (
                 product.variants.map((v) => (
                   <button
                     key={v.name}
