@@ -1,6 +1,7 @@
-const express = require('express');
-const router  = express.Router();
-const Order   = require('../models/order');
+const express   = require('express');
+const router    = express.Router();
+const Order     = require('../models/order');
+const sendEmail = require('../utils/sendEmail');
 
 // ── POST /api/orders — Create new order ─────────────────────
 router.post('/', async (req, res) => {
@@ -44,6 +45,19 @@ router.post('/', async (req, res) => {
 
     const saved = await newOrder.save();
     console.log("📦 New Order:", orderId);
+
+    // Send Order Confirmation Email
+    const emailHTML = `
+      <div style="font-family: sans-serif; padding: 20px;">
+        <h2>Thank you for your order, ${customer.name}! 🌸</h2>
+        <p>Your order ID is <strong>${orderId}</strong>.</p>
+        <p>We have received your order and are currently processing your handmade treasures.</p>
+        <p>Total amount: ₹${payment.totalAmount}</p>
+        <br/>
+        <p>With love,<br/>The ShimmerNest Team</p>
+      </div>
+    `;
+    await sendEmail(customer.email, "Your ShimmerNest Order is Confirmed!", emailHTML);
 
     res.status(201).json({ message: "Order placed 💜", orderId: saved.orderId, order: saved });
 
@@ -145,6 +159,21 @@ router.patch('/:orderId', async (req, res) => {
     if (!updated) return res.status(404).json({ error: "Order not found" });
 
     console.log(`✅ Order ${req.params.orderId} updated:`, update);
+
+    // Send Order Shipped Email
+    if (update.orderStatus === 'Shipped') {
+      const emailHTML = `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2>Great news, ${updated.customer.name}! 🚚</h2>
+          <p>Your ShimmerNest order <strong>${updated.orderId}</strong> has been shipped!</p>
+          ${updated.shipping.trackingId ? `<p>Tracking ID: <strong>${updated.shipping.trackingId}</strong> (${updated.shipping.courier || 'Courier'})</p>` : ''}
+          <br/>
+          <p>Thank you for shopping with ShimmerNest! 💜</p>
+        </div>
+      `;
+      await sendEmail(updated.customer.email, "Your ShimmerNest Order has Shipped!", emailHTML);
+    }
+
     res.status(200).json({ message: "Order updated 💜", order: updated });
 
   } catch (err) {

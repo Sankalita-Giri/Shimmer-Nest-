@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import emailjs from "@emailjs/browser";
+import Confetti from "react-confetti";
 import { useTheme } from "../context/ThemeContext";
 
 // ── Pricing constants (single source of truth) ────────────
@@ -22,6 +23,19 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
   const [giftWrap, setGiftWrap]       = useState(false);
   const [giftMessage, setGiftMessage] = useState("");
 
+  // Promo Code
+  const [promoCode, setPromoCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [promoError, setPromoError] = useState("");
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+  useEffect(() => {
+    const handleResize = () => setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const [formData, setFormData] = useState({
     name:          customer?.name    || "",
     phone:         customer?.phone   || "",
@@ -39,10 +53,12 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
 
   // ── Pricing calculations ──────────────────────────────────
   const subtotal       = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
-  const deliveryCharge = subtotal === 0 ? 0 : subtotal >= FREE_SHIPPING_MIN ? 0 : DELIVERY_CHARGE;
+  const discountAmount = promoApplied ? Math.floor(subtotal * 0.10) : 0;
+  const discountedSubtotal = subtotal - discountAmount;
+  const deliveryCharge = discountedSubtotal === 0 ? 0 : discountedSubtotal >= FREE_SHIPPING_MIN ? 0 : DELIVERY_CHARGE;
   const giftWrapCharge = giftWrap ? GIFT_WRAP_CHARGE : 0;
-  const grandTotal     = subtotal + deliveryCharge + giftWrapCharge;
-  const amountToFreeShipping = FREE_SHIPPING_MIN - subtotal;
+  const grandTotal     = discountedSubtotal + deliveryCharge + giftWrapCharge;
+  const amountToFreeShipping = Math.max(0, FREE_SHIPPING_MIN - discountedSubtotal);
 
   // ── Handlers ──────────────────────────────────────────────
   const handleChange = (e) => {
@@ -55,6 +71,18 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
     navigator.clipboard.writeText(upiId);
     setUpiCopied(true);
     setTimeout(() => setUpiCopied(false), 2000);
+  };
+
+  const handleApplyPromo = () => {
+    if (promoCode.trim().toUpperCase() === "SHIMMER10") {
+      setPromoApplied(true);
+      setPromoError("");
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 5000);
+    } else {
+      setPromoApplied(false);
+      setPromoError("Invalid promo code 😢");
+    }
   };
 
   const validateForm = () => {
@@ -226,7 +254,7 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
           </div>
 
           {/* Free shipping progress */}
-          {subtotal < FREE_SHIPPING_MIN && (
+          {discountedSubtotal < FREE_SHIPPING_MIN && (
             <div className={`rounded-[2rem] border-4 shadow-lg p-5 ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-white'}`}>
               <div className="flex justify-between items-center mb-2">
                 <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest">
@@ -234,25 +262,56 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
                     ? `Add ₹${amountToFreeShipping} more for FREE shipping! 🚚`
                     : "FREE shipping unlocked! 🎉"}
                 </p>
-                <p className={`text-[9px] font-black ${dark ? 'text-purple-400' : 'text-gray-400'}`}>₹{subtotal} / ₹{FREE_SHIPPING_MIN}</p>
+                <p className={`text-[9px] font-black ${dark ? 'text-purple-400' : 'text-gray-400'}`}>₹{discountedSubtotal} / ₹{FREE_SHIPPING_MIN}</p>
               </div>
               <div className="w-full h-2 bg-purple-50 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-purple-500 to-pink-400 rounded-full transition-all duration-700"
-                  style={{ width: `${Math.min((subtotal / FREE_SHIPPING_MIN) * 100, 100)}%` }}
+                  style={{ width: `${Math.min((discountedSubtotal / FREE_SHIPPING_MIN) * 100, 100)}%` }}
                 />
               </div>
             </div>
           )}
 
-          {subtotal >= FREE_SHIPPING_MIN && (
+          {discountedSubtotal >= FREE_SHIPPING_MIN && (
             <div className="bg-green-50 border-2 border-green-100 rounded-[2rem] p-4 text-center">
               <p className="text-[10px] font-black text-green-600 uppercase tracking-widest">
                 🎉 Free Shipping Unlocked!
-                {subtotal >= FREE_GIFT_MIN ? " & 🎁 Free Gift too!" : ""}
+                {discountedSubtotal >= FREE_GIFT_MIN ? " & 🎁 Free Gift too!" : ""}
               </p>
             </div>
           )}
+
+          {/* Promo Code section */}
+          <div className={`rounded-[2.5rem] border-4 p-6 shadow-xl transition-all ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-white'}`}>
+            <h4 className={`text-sm font-black mb-3 ${dark ? 'text-purple-100' : 'text-gray-800'}`}>Got a Promo Code? 🎟️</h4>
+            <div className="flex gap-3">
+              <input 
+                type="text" 
+                value={promoCode} 
+                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                placeholder="e.g. SHIMMER10"
+                disabled={promoApplied}
+                className={`flex-grow p-4 rounded-2xl border-2 outline-none font-bold text-sm tracking-widest uppercase transition-all ${
+                  promoApplied 
+                    ? "bg-green-50 border-green-200 text-green-700" 
+                    : (dark ? 'bg-gray-800 border-gray-700 text-white focus:border-purple-500' : 'bg-gray-50 border-transparent focus:border-purple-300 text-gray-800')
+                }`} 
+              />
+              <button 
+                onClick={promoApplied ? () => { setPromoApplied(false); setPromoCode(""); } : handleApplyPromo}
+                className={`px-6 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${
+                  promoApplied 
+                    ? "bg-red-100 text-red-500 hover:bg-red-200" 
+                    : "bg-purple-600 text-white hover:bg-purple-700 active:scale-95 shadow-lg shadow-purple-200/50"
+                }`}
+              >
+                {promoApplied ? "Remove" : "Apply"}
+              </button>
+            </div>
+            {promoError && <p className="text-red-400 text-[10px] font-bold mt-2 px-1">{promoError}</p>}
+            {promoApplied && <p className="text-green-500 text-[10px] font-bold mt-2 px-1">🎉 Woohoo! 10% discount applied!</p>}
+          </div>
 
           {/* Gift wrap toggle */}
           <div className={`rounded-[2.5rem] border-4 p-6 shadow-xl transition-all ${giftWrap ? (dark ? 'border-pink-700 bg-gray-900' : 'border-pink-200 bg-white') : (dark ? 'border-purple-900/40 bg-gray-900' : 'border-white bg-white')}`}>
@@ -298,6 +357,12 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
                 <span className="text-[11px] font-black text-purple-300 uppercase tracking-wider">Items Subtotal</span>
                 <span className="text-white font-black">₹{subtotal}</span>
               </div>
+              {promoApplied && (
+                <div className="flex justify-between items-center">
+                  <span className="text-[11px] font-black text-green-300 uppercase tracking-wider">🎟️ Promo (10% Off)</span>
+                  <span className="text-green-400 font-black">-₹{discountAmount}</span>
+                </div>
+              )}
               <div className="flex justify-between items-center">
                 <span className="text-[11px] font-black text-purple-300 uppercase tracking-wider">
                   Delivery {deliveryCharge === 0 ? "🎉" : ""}
@@ -320,7 +385,7 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
                   <span className="text-pink-300 font-black">₹{GIFT_WRAP_CHARGE}</span>
                 </div>
               )}
-              {subtotal >= FREE_GIFT_MIN && (
+              {discountedSubtotal >= FREE_GIFT_MIN && (
                 <div className="flex justify-between items-center">
                   <span className="text-[11px] font-black text-purple-300 uppercase tracking-wider">🎁 Free Gift</span>
                   <span className="text-green-400 font-black">Included!</span>
@@ -438,6 +503,12 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
                 <span className="text-purple-300 font-bold text-[11px] uppercase tracking-wider">Items Subtotal</span>
                 <span className="font-black">₹{subtotal}</span>
               </div>
+              {promoApplied && (
+                <div className="flex justify-between">
+                  <span className="text-green-300 font-bold text-[11px] uppercase tracking-wider">🎟️ Promo (10% Off)</span>
+                  <span className="text-green-400 font-black">-₹{discountAmount}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-purple-300 font-bold text-[11px] uppercase tracking-wider">Delivery</span>
                 {deliveryCharge === 0
@@ -554,6 +625,12 @@ export default function OrderForm({ cart, goBack, onOrderSuccess, customer }) {
           <button onClick={() => setStep("form")} className="text-gray-300 font-black text-[9px] uppercase tracking-widest block w-full hover:text-purple-400 transition-colors">
             ← Edit Delivery Info
           </button>
+        </div>
+      )}
+
+      {showConfetti && (
+        <div className="fixed inset-0 z-50 pointer-events-none">
+          <Confetti width={windowSize.width} height={windowSize.height} recycle={false} numberOfPieces={500} />
         </div>
       )}
     </div>

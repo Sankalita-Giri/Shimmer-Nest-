@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { subCategories as defaultSubCats } from "../data";
 import { useTheme } from '../context/ThemeContext';
 import { useSiteConfig } from '../context/SiteConfigContext';
@@ -6,13 +6,37 @@ import SkeletonCard from './SkeletonCard';
 
 export default function ProductList({ category, subCat, setSelectedProduct, setView, goBack, products, loading }) {
   const { dark } = useTheme();
-
   const { siteConfig } = useSiteConfig();
 
-  const items = products ? products.filter(p =>
-    p.category?.toLowerCase() === category?.toLowerCase() &&
-    p.subCat?.toLowerCase() === subCat?.toLowerCase()
-  ) : [];
+  // --- Filter State ---
+  const [searchTerm, setSearchTerm] = useState('');
+  const [maxPrice, setMaxPrice] = useState(2500);
+  const [inStockOnly, setInStockOnly] = useState(false);
+
+  const baseItems = useMemo(() => {
+    return products ? products.filter(p =>
+      p.category?.toLowerCase() === category?.toLowerCase() &&
+      p.subCat?.toLowerCase() === subCat?.toLowerCase()
+    ) : [];
+  }, [products, category, subCat]);
+
+  // Filter items dynamically
+  const items = useMemo(() => {
+    return baseItems.filter(item => {
+      const itemName = item.name || "";
+      const itemTag = item.tag || "";
+      
+      const matchesSearch = itemName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            itemTag.toLowerCase().includes(searchTerm.toLowerCase());
+                            
+      const itemPrice = Number(item.price) || 0;
+      const matchesPrice = itemPrice <= maxPrice;
+      
+      const matchesStock = inStockOnly ? (item.stock !== undefined && item.stock > 0) : true;
+      
+      return matchesSearch && matchesPrice && matchesStock;
+    });
+  }, [baseItems, searchTerm, maxPrice, inStockOnly]);
 
   const currentSubCats = siteConfig?.subCategories?.[category] || defaultSubCats[category] || [];
   const subCatData = currentSubCats.find(s => s.id === subCat);
@@ -45,6 +69,68 @@ export default function ProductList({ category, subCat, setSelectedProduct, setV
           </div>
         )}
       </div>
+
+      {/* Filter UI */}
+      {baseItems.length > 0 && (
+        <div className={`mb-10 p-6 rounded-3xl border-2 transition-all shadow-sm ${dark ? 'bg-gray-900 border-purple-900/40' : 'bg-white border-purple-50'}`}>
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            
+            {/* Search Bar */}
+            <div className="relative w-full lg:w-1/3">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl opacity-50">🔍</span>
+              <input 
+                type="text" 
+                placeholder="Search treasures..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className={`w-full pl-12 pr-4 py-3.5 rounded-2xl outline-none font-bold text-sm transition-all ${dark ? 'bg-gray-800 text-white focus:ring-2 focus:ring-purple-600' : 'bg-gray-50 text-gray-800 focus:ring-2 focus:ring-purple-400'}`}
+              />
+            </div>
+
+            {/* Controls */}
+            <div className="flex flex-wrap items-center gap-6 w-full lg:w-auto">
+              {/* Price Slider */}
+              <div className="flex flex-col flex-1 min-w-[150px]">
+                <label className={`text-[10px] font-black uppercase tracking-widest mb-2 ${dark ? 'text-purple-300' : 'text-gray-400'}`}>
+                  Max Price: ₹{maxPrice}
+                </label>
+                <input 
+                  type="range" 
+                  min="0" max="5000" step="100"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(Number(e.target.value))}
+                  className="w-full accent-purple-500 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+
+              {/* In Stock Toggle */}
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative">
+                  <input 
+                    type="checkbox" 
+                    checked={inStockOnly}
+                    onChange={(e) => setInStockOnly(e.target.checked)}
+                    className="sr-only"
+                  />
+                  <div className={`block w-10 h-6 rounded-full transition-colors ${inStockOnly ? 'bg-purple-600' : (dark ? 'bg-gray-700' : 'bg-gray-200')}`}></div>
+                  <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${inStockOnly ? 'transform translate-x-4' : ''}`}></div>
+                </div>
+                <span className={`text-[10px] font-black uppercase tracking-widest transition-colors ${inStockOnly ? 'text-purple-500' : (dark ? 'text-purple-300' : 'text-gray-600')}`}>
+                  In Stock Only
+                </span>
+              </label>
+
+              {/* Reset Button */}
+              <button 
+                onClick={() => { setSearchTerm(''); setMaxPrice(2500); setInStockOnly(false); }}
+                className={`px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${dark ? 'bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-gray-200'}`}
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Product Grid */}
       {loading ? (
@@ -134,22 +220,23 @@ export default function ProductList({ category, subCat, setSelectedProduct, setV
         <div className={`text-center py-32 backdrop-blur-sm rounded-[4rem] border-4 border-dashed flex flex-col items-center ${dark ? 'bg-purple-950/30 border-purple-800/40' : 'bg-white/50 border-purple-100'}`}>
           <div className="relative">
             <div className={`w-28 h-28 rounded-full flex items-center justify-center text-6xl mb-8 animate-bounce ${dark ? 'bg-purple-900/60' : 'bg-purple-50'}`}>
-              🧶
+              🔍
             </div>
             <div className="absolute -top-2 -right-2 w-8 h-8 bg-pink-400 rounded-full border-4 border-white animate-ping"></div>
           </div>
           <h3 className={`text-3xl font-black italic mb-3 tracking-tighter ${dark ? 'text-white' : 'text-gray-800'}`}>
-            Patience is Magic...
+            No Magic Found!
           </h3>
           <p className={`font-bold text-[10px] uppercase tracking-[0.2em] max-w-[280px] mx-auto leading-relaxed opacity-70 ${dark ? 'text-purple-300' : 'text-gray-400'}`}>
-            Our tiny hands are currently crocheting <br />
-            new <span className="text-purple-400">{subCatName}</span> designs just for you!
+            Try adjusting your filters <br />
+            or search terms to find <br/>
+            what you're looking for!
           </p>
           <button
-            onClick={goBack}
+            onClick={() => { setSearchTerm(''); setMaxPrice(2500); setInStockOnly(false); }}
             className="mt-10 px-10 py-4 bg-purple-600 text-white rounded-full font-black text-[10px] uppercase tracking-[0.3em] shadow-xl hover:bg-purple-700 hover:scale-105 active:scale-95 transition-all"
           >
-            Explore Other Nests
+            Clear Filters
           </button>
         </div>
       )}
